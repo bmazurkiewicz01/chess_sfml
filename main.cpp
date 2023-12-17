@@ -1,6 +1,8 @@
 #include <SFML/Graphics.hpp>
 #include <array>
+
 #include "Tile.hpp"
+#include "Pawn.hpp"
 
 int main()
 {
@@ -10,11 +12,21 @@ int main()
     {
         for (int x = 0; x < 8; x++)
         {
-            sf::Color tileColor = (x + y) % 2 == 0 ? sf::Color::White : sf::Color::Black;
+            sf::Color tileColor = (x + y) % 2 == 0 ? sf::Color::White : sf::Color::Green;
             board[y][x] = Tile(100.f, x, y, tileColor);
             // std::cout << board[y][x] << std::endl;
         }
     }
+
+    sf::Texture blackPawnTexture;
+    blackPawnTexture.loadFromFile("../resources/black-pawn.png");
+    sf::Texture whitePawnTexture;
+    whitePawnTexture.loadFromFile("../resources/white-pawn.png");
+
+    Pawn pawn(blackPawnTexture);
+    // pawn.setSize(sf::Vector2f(100.f, 100.f));
+    // pawn.setPosition(sf::Vector2f(board[6][1].getPosition().x, board[6][1].getPosition().y));
+    board[6][1].setPiece(std::make_shared<Pawn>(pawn));
 
     while (window.isOpen())
     {
@@ -25,15 +37,31 @@ int main()
                 window.close();
             if (event.type == sf::Event::MouseButtonPressed)
             {
+                sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
                 if (event.mouseButton.button == sf::Mouse::Left)
                 {
-                    sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-                    for (const auto& row : board) 
+                    for (auto& row : board) 
                     {
-                        for (const auto& tile : row) 
+                        for (auto& tile : row) 
                         {
                             if (tile.containsPoint(mousePosition))
                             {
+                                Pawn newPawn(whitePawnTexture);
+                                tile.setPiece(std::make_shared<Pawn>(newPawn));
+                                std::cout << "Clicked on tile:" << std::endl << tile << std::endl;
+                            }
+                        }
+                    }
+                }
+                else if (event.mouseButton.button == sf::Mouse::Right)
+                {
+                    for (auto& row : board) 
+                    {
+                        for (auto& tile : row) 
+                        {
+                            if (tile.containsPoint(mousePosition))
+                            {
+                                tile.setPiece(nullptr);
                                 std::cout << "Clicked on tile:" << std::endl << tile << std::endl;
                             }
                         }
@@ -48,6 +76,7 @@ int main()
             for (const auto& tile : row) 
             {
                 window.draw(tile);
+                // if (tile.getPiece()) window.draw(*tile.getPiece());
             }
         }
         window.display();

@@ -1,5 +1,11 @@
+#ifndef TILE_HPP
+#define TILE_HPP
+
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <memory>
+
+#include "Piece.hpp"
 
 class Tile : public sf::Drawable, public sf::Transformable
 {
@@ -8,62 +14,23 @@ private:
     float m_x;
     float m_y;
     sf::Color m_tileColor;
+    std::shared_ptr<Piece> m_piece;
 
     friend std::ostream& operator<<(std::ostream& stream, const Tile& tile);
 
 public:
-    Tile() = default;
-    Tile(float size, float x, float y, sf::Color tileColor) : m_size(sf::Vector2f(size, size)), m_x(x), m_y(y), m_tileColor(tileColor)
-    {
-        setPosition(sf::Vector2f(x * size, y * size));
-    }
+    Tile();
+    Tile(float size, float x, float y, sf::Color tileColor);
 
-    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const
-    {
-        states.transform *= getTransform();
+    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+    bool containsPoint(sf::Vector2f point) const;
 
-        sf::RectangleShape shape(m_size);
-        shape.setFillColor(m_tileColor);
-        shape.setPosition(getPosition());
-        target.draw(shape);
-    }
-
-    bool containsPoint(sf::Vector2f point) const 
-    {
-        sf::FloatRect bounds(getPosition(), m_size);
-        return bounds.contains(point);
-    }
-
-    sf::Vector2f getSize() const
-    {
-        return m_size;
-    }
-
-    float getX() const 
-    {
-        return m_x;
-    }
-
-    float getY() const 
-    {
-        return m_y;
-    }
-
-    sf::Color getColor() const 
-    {
-        return m_tileColor;
-    }
+    sf::Vector2f getSize() const;
+    float getX() const;
+    float getY() const;
+    sf::Color getColor() const;
+    std::shared_ptr<const Piece> getPiece() const;
+    void setPiece(const std::shared_ptr<Piece>& piece);
 };
 
-std::ostream& operator<<(std::ostream& stream, const Tile& tile)
-{
-    std::string color = tile.m_tileColor == sf::Color::White ? "White" : "Black";
-    stream << "Tile {" << std::endl
-           << "\tm_size: " << tile.m_size.x << ", " << tile.m_size.y
-           << "\n\tm_x: " << tile.m_x
-           << "\n\tm_y: " << tile.m_y
-           << "\n\tposition: " << tile.getPosition().x << ", " << tile.getPosition().y
-           << "\n\tm_tileColor: " << color << std::endl
-           << "}";
-    return stream;
-}
+#endif

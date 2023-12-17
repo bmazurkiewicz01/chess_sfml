@@ -9,6 +9,7 @@ find_package(SFML 2.6 COMPONENTS graphics audio REQUIRED)
 set(SOURCES
     main.cpp
     src/Tile.cpp
+    src/Piece.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
