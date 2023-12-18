@@ -68,12 +68,14 @@ void Tile::setPiece(const std::shared_ptr<Piece>& piece)
 std::ostream& operator<<(std::ostream& stream, const Tile& tile)
 {
     std::string color = tile.m_tileColor == sf::Color::White ? "White" : "Black";
+    std::string piece = tile.m_piece ? "piece" : "nullptr";
     stream << "Tile {" << std::endl
            << "\tm_size: " << tile.m_size.x << ", " << tile.m_size.y
            << "\n\tm_x: " << tile.m_x
            << "\n\tm_y: " << tile.m_y
            << "\n\tposition: " << tile.getPosition().x << ", " << tile.getPosition().y
-           << "\n\tm_tileColor: " << color << std::endl
+           << "\n\tm_tileColor: " << color
+           << "\n\tm_piece: " << piece << std::endl
            << "}";
     return stream;
 }

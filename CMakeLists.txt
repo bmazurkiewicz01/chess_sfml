@@ -6,14 +6,19 @@ set(CMAKE_CXX_STANDARD 14)
 
 find_package(SFML 2.6 COMPONENTS graphics audio REQUIRED)
 
-set(SOURCES
-    main.cpp
-    src/Tile.cpp
-    src/Piece.cpp
+add_executable(${PROJECT_NAME} main.cpp)
+
+add_subdirectory(model)
+add_subdirectory(controller)
+add_subdirectory(view)
+
+target_link_libraries(${PROJECT_NAME} 
+    CHESS_MODEL_SRC
+    CHESS_MODEL_INCLUDE
+    CHESS_CONTROLLER_INCLUDE 
+    CHESS_CONTROLLER_SRC
+    CHESS_VIEW_INCLUDE 
+    CHESS_VIEW_SRC
+    sfml-graphics 
+    sfml-audio
 )
-
-add_executable(${PROJECT_NAME} ${SOURCES})
-
-target_include_directories(${PROJECT_NAME} PRIVATE include)
-
-target_link_libraries(${PROJECT_NAME} sfml-graphics sfml-audio)
