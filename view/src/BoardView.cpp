@@ -1,19 +1,35 @@
 #include "BoardView.hpp"
+#include "EventManager.hpp"
 #include "Pawn.hpp"
 
 BoardView::BoardView(sf::RenderWindow& window) : m_window(window)
 {
-    whitePawnTexture.loadFromFile("../resources/white-pawn.png");
+    
 }
 
 void BoardView::initializeBoard()
 {
+    whitePawnTexture.loadFromFile("../resources/white-pawn.png");
+    blackPawntexture.loadFromFile("../resources/black-pawn.png");
     for (int y = 0; y < 8; y++)
     {
         for (int x = 0; x < 8; x++)
         {
             sf::Color tileColor = (x + y) % 2 == 0 ? sf::Color::White : sf::Color::Green;
             m_board[y][x] = Tile(100.f, x, y, tileColor);
+
+            if(y == 1)
+            {
+                PieceColor pieceColor = tileColor == sf::Color::White ? PieceColor::WHITE : PieceColor::BLACK;
+                Pawn pawn(blackPawntexture, x, y, pieceColor);
+                m_board[y][x].setPiece(std::make_shared<Pawn>(pawn));
+            }
+            else if(y == 6)
+            {
+                PieceColor pieceColor = tileColor == sf::Color::White ? PieceColor::WHITE : PieceColor::BLACK;
+                Pawn pawn(whitePawnTexture, x, y, pieceColor);
+                m_board[y][x].setPiece(std::make_shared<Pawn>(pawn));
+            }
         }
     }
 }
@@ -36,28 +52,28 @@ void BoardView::handleEvents()
                     {
                         if (tile.containsPoint(mousePosition))
                         {
-                            Pawn newPawn(whitePawnTexture);
-                            tile.setPiece(std::make_shared<Pawn>(newPawn));
-                            std::cout << "Clicked on tile:" << std::endl << tile << std::endl;
-                        }
-                    }
-                }
-            }
-            else if (event.mouseButton.button == sf::Mouse::Right)
-            {
-                for (auto& row : m_board) 
-                {
-                    for (auto& tile : row) 
-                    {
-                        if (tile.containsPoint(mousePosition))
-                        {
-                            tile.setPiece(nullptr);
-                            std::cout << "Clicked on tile:" << std::endl << tile << std::endl;
+                            std::cout << "Original address: " << &tile << std::endl; 
+                            EventManager::getInstance().publish<Tile>(EventType::ON_TILE_PRESSED, std::shared_ptr<Tile>{&tile, [](Tile*){}});
                         }
                     }
                 }
             }
         }
+        //     else if (event.mouseButton.button == sf::Mouse::Right)
+        //     {
+        //         for (auto& row : m_board) 
+        //         {
+        //             for (auto& tile : row) 
+        //             {
+        //                 if (tile.containsPoint(mousePosition))
+        //                 {
+        //                     tile.setPiece(nullptr);
+        //                     std::cout << "Clicked on tile:" << std::endl << tile << std::endl;
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
     }
 }
 

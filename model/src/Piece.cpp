@@ -1,6 +1,6 @@
 #include "Piece.hpp"
 
-Piece::Piece(sf::Texture& pieceTexture) : m_pieceSprite(sf::Sprite(pieceTexture))
+Piece::Piece(sf::Texture& pieceTexture, int x, int y, PieceColor pieceColor) : m_pieceSprite(sf::Sprite(pieceTexture)), m_x(x), m_y(y), m_pieceColor(pieceColor)
 {
 
 }

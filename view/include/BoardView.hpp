@@ -9,7 +9,9 @@ class BoardView
 {
 private:
     sf::Texture whitePawnTexture;
+    sf::Texture blackPawntexture;
     sf::RenderWindow& m_window;
+
     std::array<std::array<Tile, 8>, 8> m_board;
 
 public:

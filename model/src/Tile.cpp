@@ -1,4 +1,5 @@
 #include "Tile.hpp"
+#include "Piece.hpp"
 
 Tile::Tile() : m_size(sf::Vector2f()), m_x(0), m_y(0), m_tileColor(sf::Color()) 
 {
@@ -55,7 +56,7 @@ sf::Color Tile::getColor() const
     return m_tileColor;
 }
 
-std::shared_ptr<const Piece> Tile::getPiece() const
+std::shared_ptr<Piece> Tile::getPiece() const
 {
     return m_piece;
 }

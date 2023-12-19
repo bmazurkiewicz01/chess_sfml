@@ -5,7 +5,7 @@
 #include <iostream>
 #include <memory>
 
-#include "Piece.hpp"
+class Piece;
 
 class Tile : public sf::Drawable, public sf::Transformable
 {
@@ -29,7 +29,7 @@ public:
     float getX() const;
     float getY() const;
     sf::Color getColor() const;
-    std::shared_ptr<const Piece> getPiece() const;
+    std::shared_ptr<Piece> getPiece() const;
     void setPiece(const std::shared_ptr<Piece>& piece);
 };
 
