@@ -1,6 +1,7 @@
 #include "BoardView.hpp"
 #include "EventManager.hpp"
 #include "Pawn.hpp"
+#include "Logger.hpp"
 
 BoardView::BoardView(sf::RenderWindow& window) : m_window(window)
 {
@@ -52,7 +53,7 @@ void BoardView::handleEvents()
                     {
                         if (tile.containsPoint(mousePosition))
                         {
-                            std::cout << "Original address: " << &tile << std::endl; 
+                            Logger::getInstance().log(LogLevel::DEBUG, "Tile address in BoardView: ", &tile);
                             EventManager::getInstance().publish<Tile>(EventType::ON_TILE_PRESSED, std::shared_ptr<Tile>{&tile, [](Tile*){}});
                         }
                     }

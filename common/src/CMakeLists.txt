@@ -1,5 +1,6 @@
 add_library(CHESS_COMMON_SRC
     EventManager.cpp
+    Logger.cpp
 )
 
 target_include_directories(CHESS_COMMON_SRC PUBLIC

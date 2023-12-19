@@ -1,6 +1,7 @@
 #include "BoardController.hpp"
 #include "EventManager.hpp"
 #include "Piece.hpp"
+#include "Logger.hpp"
 
 BoardController::BoardController(BoardView& view) : m_view(view), m_clickedTile(nullptr) 
 {
@@ -19,7 +20,7 @@ void BoardController::run() {
 
 void BoardController::handleOnTilePressed(const std::shared_ptr<Tile>& tile)
 {
-    std::cout << "Got address: " << tile.get() << std::endl;
+    Logger::getInstance().log(LogLevel::DEBUG, "Tile address in BoardController: ", tile.get());
     if (m_clickedTile)
     {
         std::shared_ptr<Piece> piece = m_clickedTile->getPiece();
