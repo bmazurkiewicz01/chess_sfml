@@ -21,6 +21,7 @@ public:
     void handleEvents();
     void drawBoard() const;
     sf::RenderWindow& getWindow();
+    const std::array<std::array<Tile, 8>, 8>& getBoard() const;
 };
 
 #endif

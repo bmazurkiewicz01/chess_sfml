@@ -5,24 +5,18 @@
 
 class Pawn : public Piece
 {
+private:
+    mutable bool m_firstMove;
+
+    bool isMovingForward(int y) const;
+    bool canPromote(int y) const;
+    bool isPathClear(int y, std::array<std::array<Tile, 8>, 8> board) const;
 public:
-    Pawn(sf::Texture& texture, int x, int y, PieceColor pieceColor) : Piece(texture, x, y, pieceColor) {}
+    Pawn(sf::Texture& texture, int x, int y, PieceColor pieceColor);
 
-    void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
-        states.transform *= getTransform();
-        target.draw(m_pieceSprite, states);
-    }
-
-    void move(Tile& tile, Tile& clickedTile) override
-    {
-        std::cout << "Got address in pawn: " << &tile << std::endl;
-        std::cout << "Move!" << std::endl;
-    }
-
-    bool isValidMove(int x, int y) override
-    {
-        return true;
-    } 
+    void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+    bool move(Tile& tile, Tile& clickedTile, std::array<std::array<Tile, 8>, 8> board) override;
+    bool isValidMove(const Tile& tile, std::array<std::array<Tile, 8>, 8> board) const override;
 };
 
 #endif

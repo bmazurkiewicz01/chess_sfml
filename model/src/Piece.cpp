@@ -19,3 +19,23 @@ sf::Sprite Piece::getPieceSprite() const
 {
     return m_pieceSprite;
 }
+
+int Piece::getPieceX() const
+{
+    return m_x;
+}
+
+int Piece::getPieceY() const
+{
+    return m_y;
+}
+
+void Piece::setPieceX(int x)
+{
+    m_x = x;
+}
+
+void Piece::setPieceY(int y)
+{
+    m_y = y;
+}

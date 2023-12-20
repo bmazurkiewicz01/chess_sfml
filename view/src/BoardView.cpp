@@ -21,14 +21,12 @@ void BoardView::initializeBoard()
 
             if(y == 1)
             {
-                PieceColor pieceColor = tileColor == sf::Color::White ? PieceColor::WHITE : PieceColor::BLACK;
-                Pawn pawn(blackPawntexture, x, y, pieceColor);
+                Pawn pawn(blackPawntexture, x, y, PieceColor::BLACK);
                 m_board[y][x].setPiece(std::make_shared<Pawn>(pawn));
             }
             else if(y == 6)
             {
-                PieceColor pieceColor = tileColor == sf::Color::White ? PieceColor::WHITE : PieceColor::BLACK;
-                Pawn pawn(whitePawnTexture, x, y, pieceColor);
+                Pawn pawn(whitePawnTexture, x, y, PieceColor::WHITE);
                 m_board[y][x].setPiece(std::make_shared<Pawn>(pawn));
             }
         }
@@ -53,28 +51,13 @@ void BoardView::handleEvents()
                     {
                         if (tile.containsPoint(mousePosition))
                         {
-                            Logger::getInstance().log(LogLevel::DEBUG, "Tile address in BoardView: ", &tile);
+                            // Logger::getInstance().log(LogLevel::DEBUG, "Tile address in BoardView: ", &tile);
                             EventManager::getInstance().publish<Tile>(EventType::ON_TILE_PRESSED, std::shared_ptr<Tile>{&tile, [](Tile*){}});
                         }
                     }
                 }
             }
         }
-        //     else if (event.mouseButton.button == sf::Mouse::Right)
-        //     {
-        //         for (auto& row : m_board) 
-        //         {
-        //             for (auto& tile : row) 
-        //             {
-        //                 if (tile.containsPoint(mousePosition))
-        //                 {
-        //                     tile.setPiece(nullptr);
-        //                     std::cout << "Clicked on tile:" << std::endl << tile << std::endl;
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
     }
 }
 
@@ -96,3 +79,7 @@ sf::RenderWindow& BoardView::getWindow()
     return m_window;
 }
 
+const std::array<std::array<Tile, 8>, 8>& BoardView::getBoard() const 
+{
+    return m_board;
+}

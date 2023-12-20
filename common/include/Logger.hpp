@@ -7,13 +7,13 @@
 
 #include "LogLevel.hpp"
 
+template <typename T>
+void printWithFormat(std::ostringstream& oss, const T& value);
+
+template <typename T, typename... Args>
+void printWithFormat(std::ostringstream& oss, const T& value, Args... args);
+
 class Logger {
-public:
-    static Logger& getInstance();
-
-    template <typename... Args>
-    void log(LogLevel level, const std::string& format, Args... args);
-
 private:
     Logger() = default;
 
@@ -21,6 +21,12 @@ private:
 
     static const std::string getColor(LogLevel level);
     static const std::string getLogLevelString(LogLevel level);
+
+public:
+    static Logger& getInstance();
+
+    template <typename... Args>
+    void log(LogLevel level, const std::string& format, Args... args);
 };
 
 template <typename... Args>
