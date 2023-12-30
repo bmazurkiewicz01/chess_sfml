@@ -20,6 +20,8 @@ protected:
     PieceColor m_pieceColor;
     mutable std::vector<Tile> m_validMoves;
 
+    bool resultsInCheck(int targetY, int targetX, const std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE>& board) const;
+
 public:
     Piece() = default;
     Piece(sf::Texture& pieceTexture, int x, int y, PieceColor pieceColor, PieceType pieceType);

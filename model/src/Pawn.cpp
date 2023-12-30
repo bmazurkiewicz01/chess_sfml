@@ -1,6 +1,5 @@
 #include "Pawn.hpp"
 #include "Logger.hpp"
-#include "KingChecker.hpp"
 
 Pawn::Pawn(sf::Texture& texture, int x, int y, PieceColor pieceColor) 
                         : Piece(texture, x, y, pieceColor, PieceType::PAWN), m_firstMove(true)
@@ -113,27 +112,5 @@ void Pawn::calculateValidMoves(std::array<std::array<Tile, BOARD_SIZE>, BOARD_SI
                     m_validMoves.emplace_back(board[targetY][targetX]);
             }
         }
-    }
-}
-
-bool Pawn::resultsInCheck(int targetY, int targetX, const std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE>& board) const
-{
-    if (targetY < 0 || targetY >= BOARD_SIZE || targetX < 0 || targetX >= BOARD_SIZE)
-    {
-        return true; 
-    }
-
-    std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> tempBoard = board;
-
-    tempBoard[targetY][targetX].setPiece(board[m_y][m_x].getPiece());
-    tempBoard[m_y][m_x].setPiece(nullptr);
-
-    if (m_pieceColor == PieceColor::WHITE)
-    {
-        return KingChecker::getInstance().isWhiteKingInCheck(tempBoard); 
-    }
-    else
-    {
-        return KingChecker::getInstance().isBlackKingInCheck(tempBoard);
     }
 }

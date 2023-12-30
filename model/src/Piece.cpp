@@ -1,4 +1,5 @@
 #include "Piece.hpp"
+#include "KingChecker.hpp"
 
 Piece::Piece(sf::Texture& pieceTexture, int x, int y, PieceColor pieceColor, PieceType pieceType) : m_pieceSprite(sf::Sprite(pieceTexture)), m_x(x), m_y(y), m_pieceColor(pieceColor), m_pieceType(pieceType)
 {
@@ -72,4 +73,26 @@ bool Piece::isValidMove(const Tile& tile, std::array<std::array<Tile, BOARD_SIZE
 const std::vector<Tile>& Piece::getValidMoves() const
 {
     return m_validMoves;
+}
+
+bool Piece::resultsInCheck(int targetY, int targetX, const std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE>& board) const
+{
+    if (targetY < 0 || targetY >= BOARD_SIZE || targetX < 0 || targetX >= BOARD_SIZE)
+    {
+        return true; 
+    }
+
+    std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> tempBoard = board;
+
+    tempBoard[targetY][targetX].setPiece(board[m_y][m_x].getPiece());
+    tempBoard[m_y][m_x].setPiece(nullptr);
+
+    if (m_pieceColor == PieceColor::WHITE)
+    {
+        return KingChecker::getInstance().isWhiteKingInCheck(tempBoard); 
+    }
+    else
+    {
+        return KingChecker::getInstance().isBlackKingInCheck(tempBoard);
+    }
 }
