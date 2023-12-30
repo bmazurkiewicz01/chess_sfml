@@ -62,7 +62,7 @@ bool Pawn::isPathClear(int y, std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZ
     return true;
 }
 
-bool Pawn::isValidMove(const Tile& tile, std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> board) const
+bool Pawn::isValidMove(const Tile& tile, std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> board, bool simulateMove) const
 {
     auto it = std::find(m_validMoves.begin(), m_validMoves.end(), tile);
     if (it == m_validMoves.end())
@@ -71,7 +71,8 @@ bool Pawn::isValidMove(const Tile& tile, std::array<std::array<Tile, BOARD_SIZE>
     }
     else
     {
-        m_firstMove = false;
+        if (!simulateMove)
+            m_firstMove = false;
         return true;
     }
 }
@@ -117,20 +118,16 @@ void Pawn::calculateValidMoves(std::array<std::array<Tile, BOARD_SIZE>, BOARD_SI
 
 bool Pawn::resultsInCheck(int targetY, int targetX, const std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE>& board) const
 {
-    // Check if the target position is within the board boundaries
     if (targetY < 0 || targetY >= BOARD_SIZE || targetX < 0 || targetX >= BOARD_SIZE)
     {
-        return true; // Treat out-of-bounds as putting the king in check for simplicity
+        return true; 
     }
 
-    // Create a temporary board to simulate the move
     std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> tempBoard = board;
 
-    // Simulate the move
     tempBoard[targetY][targetX].setPiece(board[m_y][m_x].getPiece());
     tempBoard[m_y][m_x].setPiece(nullptr);
 
-    // Check if the move puts the king in check
     if (m_pieceColor == PieceColor::WHITE)
     {
         return KingChecker::getInstance().isWhiteKingInCheck(tempBoard); 

@@ -30,7 +30,6 @@ bool KingChecker::isBlackKingInCheck(const std::array<std::array<Tile, BOARD_SIZ
 
 bool KingChecker::isKingInCheck(const King& king, const std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE>& board) const
 {
-    std::cout << "King: " << &king << std::endl;
     PieceColor kingColor = king.getPieceColor();
     int kingX = king.getPieceX();
     int kingY = king.getPieceY();
@@ -55,7 +54,7 @@ bool KingChecker::isKingInCheck(const King& king, const std::array<std::array<Ti
                         return true;
                     }
                 }
-                if (piece->isValidMove(board[kingY][kingX], board)) 
+                if (piece->isValidMove(board[kingY][kingX], board, true)) 
                 {
                     return true;
                 }

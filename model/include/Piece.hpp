@@ -26,7 +26,7 @@ public:
     virtual ~Piece();
 
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-    virtual bool isValidMove(const Tile& tile, std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> board) const;
+    virtual bool isValidMove(const Tile& tile, std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> board, bool simulateMove = false) const;
     virtual void calculateValidMoves(std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> board, bool simulateMoves = false) const = 0;
     void setSize(const sf::Vector2f& size);
 

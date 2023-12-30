@@ -56,7 +56,7 @@ PieceType Piece::getPieceType() const
     return m_pieceType;
 }
 
-bool Piece::isValidMove(const Tile& tile, std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> board) const
+bool Piece::isValidMove(const Tile& tile, std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> board, bool simulateMove) const
 {
     auto it = std::find(m_validMoves.begin(), m_validMoves.end(), tile);
     if (it == m_validMoves.end())

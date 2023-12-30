@@ -7,7 +7,7 @@ King::King(sf::Texture& texture, int x, int y, PieceColor pieceColor)
     
 }
 
-bool King::isValidMove(const Tile& tile, std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> board) const
+bool King::isValidMove(const Tile& tile, std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> board, bool simulateMove) const
 {
     auto it = std::find(m_validMoves.begin(), m_validMoves.end(), tile);
     if (it == m_validMoves.end())
@@ -16,7 +16,8 @@ bool King::isValidMove(const Tile& tile, std::array<std::array<Tile, BOARD_SIZE>
     }
     else
     {
-        m_firstMove = false;
+        if (!simulateMove)
+            m_firstMove = false;
         return true;
     }
 }
@@ -24,8 +25,6 @@ bool King::isValidMove(const Tile& tile, std::array<std::array<Tile, BOARD_SIZE>
 void King::calculateValidMoves(std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> board, bool simulateMoves) const
 {
     m_validMoves.clear();
-
-    std::cout << "King in king " << this << std::endl;
 
     for (int deltaY = -1; deltaY <= 1; ++deltaY) 
     {
