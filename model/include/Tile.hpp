@@ -31,6 +31,8 @@ public:
     sf::Color getColor() const;
     std::shared_ptr<Piece> getPiece() const;
     void setPiece(const std::shared_ptr<Piece>& piece);
+
+    friend bool operator==(const Tile& lhs, const Tile& rhs);
 };
 
 #endif

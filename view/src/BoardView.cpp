@@ -12,9 +12,9 @@ void BoardView::initializeBoard()
 {
     whitePawnTexture.loadFromFile("../resources/white-pawn.png");
     blackPawntexture.loadFromFile("../resources/black-pawn.png");
-    for (int y = 0; y < 8; y++)
+    for (int y = 0; y < BOARD_SIZE; y++)
     {
-        for (int x = 0; x < 8; x++)
+        for (int x = 0; x < BOARD_SIZE; x++)
         {
             sf::Color tileColor = (x + y) % 2 == 0 ? sf::Color::White : sf::Color::Green;
             m_board[y][x] = Tile(100.f, x, y, tileColor);
@@ -74,12 +74,26 @@ void BoardView::drawBoard() const
     m_window.display();
 }
 
+void BoardView::drawMoveHint(std::vector<Tile> validMoves) const
+{
+    for (const auto& tile : validMoves)
+    {
+        sf::CircleShape hintCircle(20.f); 
+        hintCircle.setFillColor(sf::Color(255, 255, 0, 150));
+        hintCircle.setPosition(tile.getPosition().x + tile.getSize().x / 2 - hintCircle.getRadius(),
+                               tile.getPosition().y + tile.getSize().x / 2 - hintCircle.getRadius());
+
+        m_window.draw(hintCircle);
+    }
+    m_window.display();
+}
+
 sf::RenderWindow& BoardView::getWindow()
 {
     return m_window;
 }
 
-const std::array<std::array<Tile, 8>, 8>& BoardView::getBoard() const 
+const std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE>& BoardView::getBoard() const 
 {
     return m_board;
 }

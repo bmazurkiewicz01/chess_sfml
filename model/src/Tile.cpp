@@ -80,3 +80,12 @@ std::ostream& operator<<(std::ostream& stream, const Tile& tile)
            << "}";
     return stream;
 }
+
+bool operator==(const Tile& lhs, const Tile& rhs)
+{
+    return lhs.m_size == rhs.m_size
+        && lhs.m_x == rhs.m_x
+        && lhs.m_y == rhs.m_y
+        && lhs.m_tileColor == rhs.m_tileColor
+        && lhs.m_piece == rhs.m_piece;
+}

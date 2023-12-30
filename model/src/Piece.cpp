@@ -39,3 +39,13 @@ void Piece::setPieceY(int y)
 {
     m_y = y;
 }
+
+PieceColor Piece::getPieceColor() const
+{
+    return m_pieceColor;
+}
+
+const std::vector<Tile>& Piece::getValidMoves() const
+{
+    return m_validMoves;
+}

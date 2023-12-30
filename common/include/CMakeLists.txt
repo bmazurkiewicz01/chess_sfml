@@ -3,6 +3,7 @@ add_library(CHESS_COMMON_INCLUDE
     EventManager.hpp
     LogLevel.hpp
     Logger.hpp
+    BoardUtils.hpp
 )
 
 set_target_properties(CHESS_COMMON_INCLUDE PROPERTIES LINKER_LANGUAGE CXX)

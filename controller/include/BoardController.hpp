@@ -8,6 +8,7 @@ class BoardController {
 private:
     BoardView& m_view;
     std::shared_ptr<Tile> m_clickedTile;
+    bool m_highlightValidMoves;
 
 public:
     BoardController(BoardView& view);
