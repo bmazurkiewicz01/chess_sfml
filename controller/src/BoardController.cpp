@@ -3,7 +3,7 @@
 #include "Piece.hpp"
 #include "Logger.hpp"
 
-BoardController::BoardController(BoardView& view) : m_view(view), m_clickedTile(nullptr), m_highlightValidMoves(false) 
+BoardController::BoardController(BoardView& view) : m_view(view), m_clickedTile(nullptr), m_highlightValidMoves(false), m_currentTurn(PieceColor::WHITE)
 {
     EventManager::getInstance().subscribe<Tile>(EventType::ON_TILE_PRESSED, [this](const std::shared_ptr<Tile>& tile) {
         this->handleOnTilePressed(tile);
@@ -28,7 +28,6 @@ void BoardController::run()
 
 void BoardController::handleOnTilePressed(const std::shared_ptr<Tile>& tile)
 {
-    // Logger::getInstance().log(LogLevel::DEBUG, "Tile address in BoardController: ", tile.get());
     if (m_clickedTile)
     {
         std::shared_ptr<Piece> piece = m_clickedTile->getPiece();
@@ -40,6 +39,8 @@ void BoardController::handleOnTilePressed(const std::shared_ptr<Tile>& tile)
                 piece->setPieceX(tile->getX());
                 piece->setPieceY(tile->getY());
                 tile->setPiece(piece);
+
+                m_currentTurn = (m_currentTurn == PieceColor::WHITE) ? PieceColor::BLACK : PieceColor::WHITE;
             }
             else
             {
@@ -55,13 +56,24 @@ void BoardController::handleOnTilePressed(const std::shared_ptr<Tile>& tile)
     {
         if(tile->getPiece() != nullptr)
         {
-            sf::Color highlightTileColor = tile->getColor() 
+            if(tile->getPiece()->getPieceColor() == m_currentTurn)
+            {
+                sf::Color highlightTileColor = tile->getColor() 
                                             == WHITE_TILE_COLOR ? WHITE_TILE_HIGHLIGHT_COLOR : BLACK_TILE_HIGHLIGHT_COLOR;
-            tile->setColor(highlightTileColor);
-            m_clickedTile = tile;
-            
-            tile->getPiece()->calculateValidMoves(m_view.getBoard());
-            m_highlightValidMoves = true;
+                tile->setColor(highlightTileColor);
+                m_clickedTile = tile;
+                
+                tile->getPiece()->calculateValidMoves(m_view.getBoard());
+                m_highlightValidMoves = true;
+            }
+            else
+            {
+                Logger::getInstance().log(LogLevel::DEBUG, "Not your turn, current turn is: ", m_currentTurn == PieceColor::WHITE ? "white" : "black");
+            }
+        }
+        else
+        {
+            Logger::getInstance().log(LogLevel::DEBUG, "There is no piece on this tile");
         }
     }
 }

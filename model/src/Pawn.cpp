@@ -1,8 +1,9 @@
 #include "Pawn.hpp"
 #include "Logger.hpp"
+#include "KingChecker.hpp"
 
 Pawn::Pawn(sf::Texture& texture, int x, int y, PieceColor pieceColor) 
-                        : Piece(texture, x, y, pieceColor), m_firstMove(true)
+                        : Piece(texture, x, y, pieceColor, PieceType::PAWN), m_firstMove(true)
 {
     
 }
@@ -19,8 +20,6 @@ bool Pawn::isMovingForward(int y) const
     {
         result = y > m_y;
     }
-
-    Logger::getInstance().log(LogLevel::DEBUG, "isMovingForward ", result);
 
     return result;
 }
@@ -63,12 +62,6 @@ bool Pawn::isPathClear(int y, std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZ
     return true;
 }
 
-void Pawn::draw(sf::RenderTarget& target, sf::RenderStates states) const 
-{
-    states.transform *= getTransform();
-    target.draw(m_pieceSprite, states);
-}
-
 bool Pawn::isValidMove(const Tile& tile, std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> board) const
 {
     auto it = std::find(m_validMoves.begin(), m_validMoves.end(), tile);
@@ -81,43 +74,9 @@ bool Pawn::isValidMove(const Tile& tile, std::array<std::array<Tile, BOARD_SIZE>
         m_firstMove = false;
         return true;
     }
-
-    // bool result = false;
-
-    // int diffX = std::abs(m_x - tile.getX());
-    // int diffY = std::abs(m_y - tile.getY());
-
-    // if(isMovingForward(tile.getY()) && isPathClear(tile.getY(), board))
-    // {
-    //     if (tile.getPiece())
-    //     {
-    //         result = (diffY == 1 && diffX == 1);
-    //     }
-    //     else
-    //     {
-    //         if (m_firstMove)
-    //         {
-    //             if (diffY > 0 && diffY <= 2 && diffX == 0)
-    //             {
-    //                 result = true;
-    //             }
-    //         }
-    //         else
-    //         {
-    //             result = (diffY == 1 && diffX == 0);
-    //         }
-    //     }   
-    // }
-
-    // if(result == true)
-    // {
-    //     m_firstMove = false;
-    // }
-
-    // return result;
 }
 
-void Pawn::calculateValidMoves(std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> board) const
+void Pawn::calculateValidMoves(std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> board, bool simulateMoves) const
 {
     m_validMoves.clear();
 
@@ -126,13 +85,17 @@ void Pawn::calculateValidMoves(std::array<std::array<Tile, BOARD_SIZE>, BOARD_SI
     int targetY = m_y + direction;
     if (targetY >= 0 && targetY < BOARD_SIZE && board[targetY][m_x].getPiece() == nullptr)
     {
-        m_validMoves.emplace_back(board[targetY][m_x]);
-        
-        if (m_firstMove)
+        if (simulateMoves || !resultsInCheck(targetY, m_x, board))
         {
-            if (targetY + direction >= 0 && targetY + direction < BOARD_SIZE && board[targetY + direction][m_x].getPiece() == nullptr)
+            m_validMoves.emplace_back(board[targetY][m_x]);
+        
+            if (m_firstMove)
             {
-                m_validMoves.emplace_back(board[targetY + direction][m_x]);
+                if ((targetY + direction) >= 0 && (targetY + direction) < BOARD_SIZE && board[targetY + direction][m_x].getPiece() == nullptr)
+                {
+                    if (simulateMoves || !resultsInCheck(targetY + direction, m_x, board))
+                        m_validMoves.emplace_back(board[targetY + direction][m_x]);
+                }
             }
         }
     }
@@ -145,15 +108,35 @@ void Pawn::calculateValidMoves(std::array<std::array<Tile, BOARD_SIZE>, BOARD_SI
             std::shared_ptr<Piece> targetPiece = board[targetY][targetX].getPiece();
             if (targetPiece && targetPiece->getPieceColor() != m_pieceColor)
             {
-                m_validMoves.emplace_back(board[targetY][targetX]);
+                if (simulateMoves || !resultsInCheck(targetY, targetX, board))
+                    m_validMoves.emplace_back(board[targetY][targetX]);
             }
         }
     }
-
-    Logger::getInstance().log(LogLevel::DEBUG, "Valid moves:");
-    for(auto t : m_validMoves)
-    {
-        Logger::getInstance().log(LogLevel::INFO, "Move: ", t);
-    }
 }
 
+bool Pawn::resultsInCheck(int targetY, int targetX, const std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE>& board) const
+{
+    // Check if the target position is within the board boundaries
+    if (targetY < 0 || targetY >= BOARD_SIZE || targetX < 0 || targetX >= BOARD_SIZE)
+    {
+        return true; // Treat out-of-bounds as putting the king in check for simplicity
+    }
+
+    // Create a temporary board to simulate the move
+    std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> tempBoard = board;
+
+    // Simulate the move
+    tempBoard[targetY][targetX].setPiece(board[m_y][m_x].getPiece());
+    tempBoard[m_y][m_x].setPiece(nullptr);
+
+    // Check if the move puts the king in check
+    if (m_pieceColor == PieceColor::WHITE)
+    {
+        return KingChecker::getInstance().isWhiteKingInCheck(tempBoard); 
+    }
+    else
+    {
+        return KingChecker::getInstance().isBlackKingInCheck(tempBoard);
+    }
+}

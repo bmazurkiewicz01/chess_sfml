@@ -1,6 +1,6 @@
 #include "Piece.hpp"
 
-Piece::Piece(sf::Texture& pieceTexture, int x, int y, PieceColor pieceColor) : m_pieceSprite(sf::Sprite(pieceTexture)), m_x(x), m_y(y), m_pieceColor(pieceColor)
+Piece::Piece(sf::Texture& pieceTexture, int x, int y, PieceColor pieceColor, PieceType pieceType) : m_pieceSprite(sf::Sprite(pieceTexture)), m_x(x), m_y(y), m_pieceColor(pieceColor), m_pieceType(pieceType)
 {
 
 }
@@ -8,6 +8,12 @@ Piece::Piece(sf::Texture& pieceTexture, int x, int y, PieceColor pieceColor) : m
 Piece::~Piece()
 {
 
+}
+
+void Piece::draw(sf::RenderTarget& target, sf::RenderStates states) const 
+{
+    states.transform *= getTransform();
+    target.draw(m_pieceSprite, states);
 }
 
 void Piece::setSize(const sf::Vector2f& size)
@@ -43,6 +49,24 @@ void Piece::setPieceY(int y)
 PieceColor Piece::getPieceColor() const
 {
     return m_pieceColor;
+}
+
+PieceType Piece::getPieceType() const
+{
+    return m_pieceType;
+}
+
+bool Piece::isValidMove(const Tile& tile, std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> board) const
+{
+    auto it = std::find(m_validMoves.begin(), m_validMoves.end(), tile);
+    if (it == m_validMoves.end())
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }   
 }
 
 const std::vector<Tile>& Piece::getValidMoves() const

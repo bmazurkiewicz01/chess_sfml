@@ -10,8 +10,12 @@
 class BoardView 
 {
 private:
+    // temporary storage for textures
+    // TODO: create better solution
     sf::Texture whitePawnTexture;
-    sf::Texture blackPawntexture;
+    sf::Texture blackPawnTexture;
+    sf::Texture whiteKingTexture;
+    sf::Texture blackKingTexture;
     sf::RenderWindow& m_window;
 
     std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> m_board;

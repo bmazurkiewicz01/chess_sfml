@@ -3,10 +3,12 @@
 
 #include <memory>
 #include "BoardView.hpp"
+#include "PieceColor.hpp"
 
 class BoardController {
 private:
     BoardView& m_view;
+    PieceColor m_currentTurn;
     std::shared_ptr<Tile> m_clickedTile;
     bool m_highlightValidMoves;
 

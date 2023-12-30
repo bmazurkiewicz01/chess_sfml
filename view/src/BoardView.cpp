@@ -1,7 +1,9 @@
 #include "BoardView.hpp"
 #include "EventManager.hpp"
 #include "Pawn.hpp"
+#include "King.hpp"
 #include "Logger.hpp"
+#include "KingChecker.hpp"
 
 BoardView::BoardView(sf::RenderWindow& window) : m_window(window)
 {
@@ -12,7 +14,9 @@ void BoardView::initializeBoard()
 {
     m_window.setFramerateLimit(60);
     whitePawnTexture.loadFromFile("../resources/white-pawn.png");
-    blackPawntexture.loadFromFile("../resources/black-pawn.png");
+    blackPawnTexture.loadFromFile("../resources/black-pawn.png");
+    whiteKingTexture.loadFromFile("../resources/white-king.png");
+    blackKingTexture.loadFromFile("../resources/black-king.png");
 
     for (int y = 0; y < BOARD_SIZE; y++)
     {
@@ -23,7 +27,7 @@ void BoardView::initializeBoard()
 
             if(y == 1)
             {
-                Pawn pawn(blackPawntexture, x, y, PieceColor::BLACK);
+                Pawn pawn(blackPawnTexture, x, y, PieceColor::BLACK);
                 m_board[y][x].setPiece(std::make_shared<Pawn>(pawn));
             }
             else if(y == 6)
@@ -33,6 +37,17 @@ void BoardView::initializeBoard()
             }
         }
     }
+
+    King whiteKing(whiteKingTexture, 4, 7, PieceColor::WHITE);
+    std::shared_ptr<King> whiteKingPtr = std::make_shared<King>(whiteKing);
+    m_board[7][4].setPiece(whiteKingPtr);
+
+    King blackKing(blackKingTexture, 4, 0, PieceColor::BLACK);
+    std::shared_ptr<King> blackKingPtr = std::make_shared<King>(blackKing);
+    m_board[0][4].setPiece(blackKingPtr);
+
+    KingChecker::getInstance().setWhiteKing(whiteKingPtr);
+    KingChecker::getInstance().setBlackKing(blackKingPtr);
 }
 
 void BoardView::handleEvents()
@@ -53,7 +68,6 @@ void BoardView::handleEvents()
                     {
                         if (tile.containsPoint(mousePosition))
                         {
-                            // Logger::getInstance().log(LogLevel::DEBUG, "Tile address in BoardView: ", &tile);
                             EventManager::getInstance().publish<Tile>(EventType::ON_TILE_PRESSED, std::shared_ptr<Tile>{&tile, [](Tile*){}});
                         }
                     }

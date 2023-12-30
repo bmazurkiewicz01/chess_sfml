@@ -1,6 +1,8 @@
 add_library(CHESS_MODEL_SRC
     Piece.cpp
+    KingChecker.cpp
     Pawn.cpp
+    King.cpp
     Tile.cpp
 )
 
