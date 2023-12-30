@@ -12,7 +12,6 @@ BoardController::BoardController(BoardView& view) : m_view(view), m_clickedTile(
 
 void BoardController::run() 
 {
-    sf::Clock clock;
     while (m_view.getWindow().isOpen()) 
     {
         m_view.handleEvents();
@@ -23,11 +22,7 @@ void BoardController::run()
             m_view.drawMoveHint(m_clickedTile->getPiece()->getValidMoves());
         }
 
-        sf::Time elapsed = clock.restart();
-        if (elapsed.asMilliseconds() < 16)  
-        {
-            sf::sleep(sf::milliseconds(16) - elapsed);
-        }
+        m_view.getWindow().display();
     }
 }
 
@@ -51,6 +46,8 @@ void BoardController::handleOnTilePressed(const std::shared_ptr<Tile>& tile)
                 Logger::getInstance().log(LogLevel::ERROR, "Invalid move");
             }
         }
+        sf::Color oldTileColor = m_clickedTile->getColor() == WHITE_TILE_HIGHLIGHT_COLOR ? WHITE_TILE_COLOR : BLACK_TILE_COLOR;
+        m_clickedTile->setColor(oldTileColor);
         m_clickedTile = nullptr;
         m_highlightValidMoves = false;
     }
@@ -58,7 +55,11 @@ void BoardController::handleOnTilePressed(const std::shared_ptr<Tile>& tile)
     {
         if(tile->getPiece() != nullptr)
         {
+            sf::Color highlightTileColor = tile->getColor() 
+                                            == WHITE_TILE_COLOR ? WHITE_TILE_HIGHLIGHT_COLOR : BLACK_TILE_HIGHLIGHT_COLOR;
+            tile->setColor(highlightTileColor);
             m_clickedTile = tile;
+            
             tile->getPiece()->calculateValidMoves(m_view.getBoard());
             m_highlightValidMoves = true;
         }

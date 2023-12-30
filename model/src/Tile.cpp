@@ -56,6 +56,11 @@ sf::Color Tile::getColor() const
     return m_tileColor;
 }
 
+void Tile::setColor(sf::Color color)
+{
+    m_tileColor = color;
+}
+
 std::shared_ptr<Piece> Tile::getPiece() const
 {
     return m_piece;
@@ -68,7 +73,7 @@ void Tile::setPiece(const std::shared_ptr<Piece>& piece)
 
 std::ostream& operator<<(std::ostream& stream, const Tile& tile)
 {
-    std::string color = tile.m_tileColor == sf::Color::White ? "White" : "Black";
+    std::string color = tile.m_tileColor == WHITE_TILE_COLOR ? "White" : "Black";
     std::string piece = tile.m_piece ? "piece" : "nullptr";
     stream << "Tile {" << std::endl
            << "\tm_size: " << tile.m_size.x << ", " << tile.m_size.y

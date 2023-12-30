@@ -10,13 +10,15 @@ BoardView::BoardView(sf::RenderWindow& window) : m_window(window)
 
 void BoardView::initializeBoard()
 {
+    m_window.setFramerateLimit(60);
     whitePawnTexture.loadFromFile("../resources/white-pawn.png");
     blackPawntexture.loadFromFile("../resources/black-pawn.png");
+
     for (int y = 0; y < BOARD_SIZE; y++)
     {
         for (int x = 0; x < BOARD_SIZE; x++)
         {
-            sf::Color tileColor = (x + y) % 2 == 0 ? sf::Color::White : sf::Color::Green;
+            sf::Color tileColor = (x + y) % 2 == 0 ? WHITE_TILE_COLOR : BLACK_TILE_COLOR;
             m_board[y][x] = Tile(100.f, x, y, tileColor);
 
             if(y == 1)
@@ -71,21 +73,31 @@ void BoardView::drawBoard() const
             m_window.draw(tile);
         }
     }
-    m_window.display();
 }
 
 void BoardView::drawMoveHint(std::vector<Tile> validMoves) const
 {
     for (const auto& tile : validMoves)
     {
-        sf::CircleShape hintCircle(20.f); 
-        hintCircle.setFillColor(sf::Color(255, 255, 0, 150));
-        hintCircle.setPosition(tile.getPosition().x + tile.getSize().x / 2 - hintCircle.getRadius(),
-                               tile.getPosition().y + tile.getSize().x / 2 - hintCircle.getRadius());
-
+        sf::CircleShape hintCircle;
+        if (tile.getPiece() == nullptr)
+        {
+            hintCircle.setRadius(17.5f); 
+            hintCircle.setFillColor(HINT_CIRCLE_COLOR);
+            hintCircle.setPosition(tile.getPosition().x + tile.getSize().x / 2 - hintCircle.getRadius(),
+                                tile.getPosition().y + tile.getSize().x / 2 - hintCircle.getRadius());
+        }
+        else
+        {
+            hintCircle.setRadius(40.f);
+            hintCircle.setFillColor(sf::Color::Transparent);
+            hintCircle.setOutlineThickness(10.f);
+            hintCircle.setPosition(tile.getPosition().x + tile.getSize().x / 2 - hintCircle.getRadius(),
+                                tile.getPosition().y + tile.getSize().x / 2 - hintCircle.getRadius());
+            hintCircle.setOutlineColor(HINT_CIRCLE_COLOR);
+        }
         m_window.draw(hintCircle);
     }
-    m_window.display();
 }
 
 sf::RenderWindow& BoardView::getWindow()

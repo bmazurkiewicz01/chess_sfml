@@ -29,6 +29,7 @@ public:
     float getX() const;
     float getY() const;
     sf::Color getColor() const;
+    void setColor(sf::Color color);
     std::shared_ptr<Piece> getPiece() const;
     void setPiece(const std::shared_ptr<Piece>& piece);
 
