@@ -18,7 +18,7 @@ private:
     sf::Texture blackKingTexture;
     sf::RenderWindow& m_window;
 
-    std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> m_board;
+    BoardType m_board;
 
 public:
     BoardView(sf::RenderWindow& window);
@@ -28,7 +28,7 @@ public:
     void drawBoard() const;
     void drawMoveHint(std::vector<Tile> validMoves) const;
     sf::RenderWindow& getWindow();
-    const std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE>& getBoard() const;
+    const BoardType& getBoard() const;
 };
 
 #endif

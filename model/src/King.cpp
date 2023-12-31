@@ -7,7 +7,7 @@ King::King(sf::Texture& texture, int x, int y, PieceColor pieceColor)
     
 }
 
-bool King::isValidMove(const Tile& tile, std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> board, bool simulateMove) const
+bool King::isValidMove(const Tile& tile, BoardType board, bool simulateMove) const
 {
     auto it = std::find(m_validMoves.begin(), m_validMoves.end(), tile);
     if (it == m_validMoves.end())
@@ -22,7 +22,7 @@ bool King::isValidMove(const Tile& tile, std::array<std::array<Tile, BOARD_SIZE>
     }
 }
 
-void King::calculateValidMoves(std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> board, bool simulateMoves) const
+void King::calculateValidMoves(BoardType board, bool simulateMoves) const
 {
     m_validMoves.clear();
 
@@ -39,7 +39,7 @@ void King::calculateValidMoves(std::array<std::array<Tile, BOARD_SIZE>, BOARD_SI
 
                 if (!targetPiece || (targetPiece && targetPiece->getPieceColor() != m_pieceColor && targetPiece->getPieceType() != PieceType::KING)) 
                 {
-                    std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> simulatedBoard = board;
+                    BoardType simulatedBoard = board;
                     simulatedBoard[m_y][m_x].setPiece(nullptr); 
 
                     King simulatedKing = *this;

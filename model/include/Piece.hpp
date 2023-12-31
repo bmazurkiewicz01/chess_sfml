@@ -20,7 +20,7 @@ protected:
     PieceColor m_pieceColor;
     mutable std::vector<Tile> m_validMoves;
 
-    bool resultsInCheck(int targetY, int targetX, const std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE>& board) const;
+    bool resultsInCheck(int targetY, int targetX, const BoardType& board) const;
 
 public:
     Piece() = default;
@@ -28,8 +28,8 @@ public:
     virtual ~Piece();
 
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-    virtual bool isValidMove(const Tile& tile, std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> board, bool simulateMove = false) const;
-    virtual void calculateValidMoves(std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> board, bool simulateMoves = false) const = 0;
+    virtual bool isValidMove(const Tile& tile, BoardType board, bool simulateMove = false) const;
+    virtual void calculateValidMoves(BoardType board, bool simulateMoves = false) const = 0;
     void setSize(const sf::Vector2f& size);
 
     sf::Sprite getPieceSprite() const;

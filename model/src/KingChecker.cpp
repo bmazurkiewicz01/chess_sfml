@@ -18,17 +18,17 @@ void KingChecker::setBlackKing(std::shared_ptr<King> king)
     m_blackKing = king;
 }
 
-bool KingChecker::isWhiteKingInCheck(const std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE>& board) const
+bool KingChecker::isWhiteKingInCheck(const BoardType& board) const
 {
     return isKingInCheck(*m_whiteKing, board);
 }
 
-bool KingChecker::isBlackKingInCheck(const std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE>& board) const
+bool KingChecker::isBlackKingInCheck(const BoardType& board) const
 {
     return isKingInCheck(*m_blackKing, board);
 }
 
-bool KingChecker::isKingInCheck(const King& king, const std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE>& board) const
+bool KingChecker::isKingInCheck(const King& king, const BoardType& board) const
 {
     PieceColor kingColor = king.getPieceColor();
     int kingX = king.getPieceX();
@@ -63,4 +63,31 @@ bool KingChecker::isKingInCheck(const King& king, const std::array<std::array<Ti
     }
 
     return false;
+}
+
+bool KingChecker::isCheckmate(const BoardType& board, PieceColor pieceColor) const
+{
+    std::shared_ptr<King> king = pieceColor == PieceColor::WHITE ? m_whiteKing : m_blackKing;
+    
+    if(!isKingInCheck(*king, board))
+    {
+        return false;
+    }
+
+    for (int y = 0; y < BOARD_SIZE; y++)
+    {
+        for (int x = 0; x < BOARD_SIZE; x++)
+        {
+            std::shared_ptr<Piece> piece = board[y][x].getPiece();
+            if (piece != nullptr && piece->getPieceColor() == pieceColor)
+            {
+                piece->calculateValidMoves(board);
+                if(!piece->getValidMoves().empty())
+                {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
 }

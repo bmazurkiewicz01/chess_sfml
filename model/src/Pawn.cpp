@@ -38,7 +38,7 @@ bool Pawn::canPromote(int y) const
     return result;
 }
 
-bool Pawn::isPathClear(int y, std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> board) const
+bool Pawn::isPathClear(int y, BoardType board) const
 {
     if (m_pieceColor == PieceColor::WHITE)
     {
@@ -61,7 +61,7 @@ bool Pawn::isPathClear(int y, std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZ
     return true;
 }
 
-bool Pawn::isValidMove(const Tile& tile, std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> board, bool simulateMove) const
+bool Pawn::isValidMove(const Tile& tile, BoardType board, bool simulateMove) const
 {
     auto it = std::find(m_validMoves.begin(), m_validMoves.end(), tile);
     if (it == m_validMoves.end())
@@ -76,7 +76,7 @@ bool Pawn::isValidMove(const Tile& tile, std::array<std::array<Tile, BOARD_SIZE>
     }
 }
 
-void Pawn::calculateValidMoves(std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> board, bool simulateMoves) const
+void Pawn::calculateValidMoves(BoardType board, bool simulateMoves) const
 {
     m_validMoves.clear();
 

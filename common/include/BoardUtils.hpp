@@ -4,6 +4,8 @@
 #include <SFML/Graphics.hpp>
 
 constexpr int BOARD_SIZE = 8;
+using BoardType = std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE>;
+
 const sf::Color WHITE_TILE_COLOR = sf::Color(232, 236, 204, 255);
 const sf::Color BLACK_TILE_COLOR = sf::Color(118, 152, 84, 255);  
 const sf::Color HINT_CIRCLE_COLOR = sf::Color(35, 35, 35, 25);

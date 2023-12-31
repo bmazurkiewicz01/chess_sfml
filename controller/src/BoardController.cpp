@@ -2,6 +2,7 @@
 #include "EventManager.hpp"
 #include "Piece.hpp"
 #include "Logger.hpp"
+#include "KingChecker.hpp"
 
 BoardController::BoardController(BoardView& view) : m_view(view), m_clickedTile(nullptr), m_highlightValidMoves(false), m_currentTurn(PieceColor::WHITE)
 {
@@ -41,6 +42,10 @@ void BoardController::handleOnTilePressed(const std::shared_ptr<Tile>& tile)
                 tile->setPiece(piece);
 
                 m_currentTurn = (m_currentTurn == PieceColor::WHITE) ? PieceColor::BLACK : PieceColor::WHITE;
+                if(KingChecker::getInstance().isCheckmate(m_view.getBoard(), m_currentTurn))
+                {
+                    Logger::getInstance().log(LogLevel::INFO, "Checkmate! ", m_currentTurn == PieceColor::WHITE ? "BLACK" : "WHITE", " won.");
+                }
             }
             else
             {

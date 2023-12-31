@@ -119,7 +119,7 @@ sf::RenderWindow& BoardView::getWindow()
     return m_window;
 }
 
-const std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE>& BoardView::getBoard() const 
+const BoardType& BoardView::getBoard() const 
 {
     return m_board;
 }

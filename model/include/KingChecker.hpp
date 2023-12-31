@@ -16,15 +16,16 @@ private:
     KingChecker(const KingChecker&) = delete;
     KingChecker& operator=(const KingChecker&) = delete;
 
-    bool isKingInCheck(const King& king, const std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE>& board) const;
+    bool isKingInCheck(const King& king, const BoardType& board) const;
 public:
     static KingChecker& getInstance();
 
     void setWhiteKing(std::shared_ptr<King> king);
     void setBlackKing(std::shared_ptr<King> king);
 
-    bool isWhiteKingInCheck(const std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE>& board) const;
-    bool isBlackKingInCheck(const std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE>& board) const;
+    bool isWhiteKingInCheck(const BoardType& board) const;
+    bool isBlackKingInCheck(const BoardType& board) const;
+    bool isCheckmate(const BoardType& board, PieceColor pieceColor) const;
 };
 
 #endif

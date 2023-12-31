@@ -57,7 +57,7 @@ PieceType Piece::getPieceType() const
     return m_pieceType;
 }
 
-bool Piece::isValidMove(const Tile& tile, std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> board, bool simulateMove) const
+bool Piece::isValidMove(const Tile& tile, BoardType board, bool simulateMove) const
 {
     auto it = std::find(m_validMoves.begin(), m_validMoves.end(), tile);
     if (it == m_validMoves.end())
@@ -75,14 +75,14 @@ const std::vector<Tile>& Piece::getValidMoves() const
     return m_validMoves;
 }
 
-bool Piece::resultsInCheck(int targetY, int targetX, const std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE>& board) const
+bool Piece::resultsInCheck(int targetY, int targetX, const BoardType& board) const
 {
     if (targetY < 0 || targetY >= BOARD_SIZE || targetX < 0 || targetX >= BOARD_SIZE)
     {
         return true; 
     }
 
-    std::array<std::array<Tile, BOARD_SIZE>, BOARD_SIZE> tempBoard = board;
+    BoardType tempBoard = board;
 
     tempBoard[targetY][targetX].setPiece(board[m_y][m_x].getPiece());
     tempBoard[m_y][m_x].setPiece(nullptr);
