@@ -16,6 +16,8 @@ private:
     sf::Texture blackPawnTexture;
     sf::Texture whiteKingTexture;
     sf::Texture blackKingTexture;
+    sf::Texture whiteQueenTexture;
+    sf::Texture blackQueenTexture;
     sf::RenderWindow& m_window;
 
     BoardType m_board;

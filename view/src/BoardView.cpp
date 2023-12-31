@@ -2,6 +2,7 @@
 #include "EventManager.hpp"
 #include "Pawn.hpp"
 #include "King.hpp"
+#include "Queen.hpp"
 #include "Logger.hpp"
 #include "KingChecker.hpp"
 
@@ -17,6 +18,8 @@ void BoardView::initializeBoard()
     blackPawnTexture.loadFromFile("../resources/black-pawn.png");
     whiteKingTexture.loadFromFile("../resources/white-king.png");
     blackKingTexture.loadFromFile("../resources/black-king.png");
+    whiteQueenTexture.loadFromFile("../resources/white-queen.png");
+    blackQueenTexture.loadFromFile("../resources/black-queen.png");
 
     for (int y = 0; y < BOARD_SIZE; y++)
     {
@@ -48,6 +51,12 @@ void BoardView::initializeBoard()
 
     KingChecker::getInstance().setWhiteKing(whiteKingPtr);
     KingChecker::getInstance().setBlackKing(blackKingPtr);
+
+    Queen whiteQueen(whiteQueenTexture, 3, 7, PieceColor::WHITE);
+    m_board[7][3].setPiece(std::make_shared<Queen>(whiteQueen));
+
+    Queen blackQueen(blackQueenTexture, 3, 0, PieceColor::BLACK);
+    m_board[0][3].setPiece(std::make_shared<Queen>(blackQueen));
 }
 
 void BoardView::handleEvents()

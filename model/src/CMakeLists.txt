@@ -3,6 +3,7 @@ add_library(CHESS_MODEL_SRC
     KingChecker.cpp
     Pawn.cpp
     King.cpp
+    Queen.cpp
     Tile.cpp
 )
 
