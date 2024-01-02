@@ -6,7 +6,7 @@
 #include "Logger.hpp"
 #include "KingChecker.hpp"
 
-BoardView::BoardView(sf::RenderWindow& window) : m_window(window)
+BoardView::BoardView(sf::RenderWindow& window, TextureManager textureManager) : m_window(window), m_textureManager(textureManager)
 {
     
 }
@@ -14,12 +14,13 @@ BoardView::BoardView(sf::RenderWindow& window) : m_window(window)
 void BoardView::initializeBoard()
 {
     m_window.setFramerateLimit(60);
-    whitePawnTexture.loadFromFile("../resources/white-pawn.png");
-    blackPawnTexture.loadFromFile("../resources/black-pawn.png");
-    whiteKingTexture.loadFromFile("../resources/white-king.png");
-    blackKingTexture.loadFromFile("../resources/black-king.png");
-    whiteQueenTexture.loadFromFile("../resources/white-queen.png");
-    blackQueenTexture.loadFromFile("../resources/black-queen.png");
+    m_textureManager.loadPieceTexture(PieceType::PAWN, PieceColor::WHITE, "../resources/white-pawn.png");
+    m_textureManager.loadPieceTexture(PieceType::PAWN, PieceColor::BLACK, "../resources/black-pawn.png");
+    m_textureManager.loadPieceTexture(PieceType::KING, PieceColor::WHITE, "../resources/white-king.png");
+    m_textureManager.loadPieceTexture(PieceType::KING, PieceColor::BLACK, "../resources/black-king.png");
+    m_textureManager.loadPieceTexture(PieceType::QUEEN, PieceColor::WHITE, "../resources/white-queen.png");
+    m_textureManager.loadPieceTexture(PieceType::QUEEN, PieceColor::BLACK, "../resources/black-queen.png");
+
 
     for (int y = 0; y < BOARD_SIZE; y++)
     {
@@ -30,32 +31,32 @@ void BoardView::initializeBoard()
 
             if(y == 1)
             {
-                Pawn pawn(blackPawnTexture, x, y, PieceColor::BLACK);
+                Pawn pawn(m_textureManager.getPieceTexture(PieceType::PAWN, PieceColor::BLACK), x, y, PieceColor::BLACK);
                 m_board[y][x].setPiece(std::make_shared<Pawn>(pawn));
             }
             else if(y == 6)
             {
-                Pawn pawn(whitePawnTexture, x, y, PieceColor::WHITE);
+                Pawn pawn(m_textureManager.getPieceTexture(PieceType::PAWN, PieceColor::WHITE), x, y, PieceColor::WHITE);
                 m_board[y][x].setPiece(std::make_shared<Pawn>(pawn));
             }
         }
     }
 
-    King whiteKing(whiteKingTexture, 4, 7, PieceColor::WHITE);
+    King whiteKing(m_textureManager.getPieceTexture(PieceType::KING, PieceColor::WHITE), 4, 7, PieceColor::WHITE);
     std::shared_ptr<King> whiteKingPtr = std::make_shared<King>(whiteKing);
     m_board[7][4].setPiece(whiteKingPtr);
 
-    King blackKing(blackKingTexture, 4, 0, PieceColor::BLACK);
+    King blackKing(m_textureManager.getPieceTexture(PieceType::KING, PieceColor::BLACK), 4, 0, PieceColor::BLACK);
     std::shared_ptr<King> blackKingPtr = std::make_shared<King>(blackKing);
     m_board[0][4].setPiece(blackKingPtr);
 
     KingChecker::getInstance().setWhiteKing(whiteKingPtr);
     KingChecker::getInstance().setBlackKing(blackKingPtr);
 
-    Queen whiteQueen(whiteQueenTexture, 3, 7, PieceColor::WHITE);
+    Queen whiteQueen(m_textureManager.getPieceTexture(PieceType::QUEEN, PieceColor::WHITE), 3, 7, PieceColor::WHITE);
     m_board[7][3].setPiece(std::make_shared<Queen>(whiteQueen));
 
-    Queen blackQueen(blackQueenTexture, 3, 0, PieceColor::BLACK);
+    Queen blackQueen(m_textureManager.getPieceTexture(PieceType::QUEEN, PieceColor::BLACK), 3, 0, PieceColor::BLACK);
     m_board[0][3].setPiece(std::make_shared<Queen>(blackQueen));
 }
 

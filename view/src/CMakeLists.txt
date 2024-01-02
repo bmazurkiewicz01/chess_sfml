@@ -1,5 +1,6 @@
 add_library(CHESS_VIEW_SRC
     BoardView.cpp
+    TextureManager.cpp
 )
 
 target_link_libraries(CHESS_VIEW_SRC
