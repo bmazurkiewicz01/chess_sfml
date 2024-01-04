@@ -3,6 +3,7 @@
 #include "Pawn.hpp"
 #include "King.hpp"
 #include "Queen.hpp"
+#include "Rook.hpp"
 #include "Logger.hpp"
 #include "KingChecker.hpp"
 
@@ -20,6 +21,8 @@ void BoardView::initializeBoard()
     m_textureManager.loadPieceTexture(PieceType::KING, PieceColor::BLACK, "../resources/black-king.png");
     m_textureManager.loadPieceTexture(PieceType::QUEEN, PieceColor::WHITE, "../resources/white-queen.png");
     m_textureManager.loadPieceTexture(PieceType::QUEEN, PieceColor::BLACK, "../resources/black-queen.png");
+    m_textureManager.loadPieceTexture(PieceType::ROOK, PieceColor::WHITE, "../resources/white-rook.png");
+    m_textureManager.loadPieceTexture(PieceType::ROOK, PieceColor::BLACK, "../resources/black-rook.png");
 
 
     for (int y = 0; y < BOARD_SIZE; y++)
@@ -58,6 +61,18 @@ void BoardView::initializeBoard()
 
     Queen blackQueen(m_textureManager.getPieceTexture(PieceType::QUEEN, PieceColor::BLACK), 3, 0, PieceColor::BLACK);
     m_board[0][3].setPiece(std::make_shared<Queen>(blackQueen));
+
+    Rook whiteRook1(m_textureManager.getPieceTexture(PieceType::ROOK, PieceColor::WHITE), 0, 7, PieceColor::WHITE);
+    m_board[7][0].setPiece(std::make_shared<Rook>(whiteRook1));
+
+    Rook whiteRook2(m_textureManager.getPieceTexture(PieceType::ROOK, PieceColor::WHITE), 7, 7, PieceColor::WHITE);
+    m_board[7][7].setPiece(std::make_shared<Rook>(whiteRook2));
+
+    Rook blackRook1(m_textureManager.getPieceTexture(PieceType::ROOK, PieceColor::BLACK), 0, 0, PieceColor::BLACK);
+    m_board[0][0].setPiece(std::make_shared<Rook>(blackRook1));
+
+    Rook blackRook2(m_textureManager.getPieceTexture(PieceType::ROOK, PieceColor::BLACK), 0, 7, PieceColor::BLACK);
+    m_board[0][7].setPiece(std::make_shared<Rook>(blackRook2));
 }
 
 void BoardView::handleEvents()

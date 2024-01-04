@@ -6,6 +6,7 @@ add_library(CHESS_MODEL_INCLUDE
     Pawn.hpp
     King.hpp
     Queen.hpp
+    Rook.hpp
     Tile.hpp
 )
 
