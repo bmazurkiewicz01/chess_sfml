@@ -71,7 +71,7 @@ void BoardView::initializeBoard()
     Rook blackRook1(m_textureManager.getPieceTexture(PieceType::ROOK, PieceColor::BLACK), 0, 0, PieceColor::BLACK);
     m_board[0][0].setPiece(std::make_shared<Rook>(blackRook1));
 
-    Rook blackRook2(m_textureManager.getPieceTexture(PieceType::ROOK, PieceColor::BLACK), 0, 7, PieceColor::BLACK);
+    Rook blackRook2(m_textureManager.getPieceTexture(PieceType::ROOK, PieceColor::BLACK), 7, 0, PieceColor::BLACK);
     m_board[0][7].setPiece(std::make_shared<Rook>(blackRook2));
 }
 

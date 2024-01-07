@@ -88,14 +88,13 @@ void Pawn::calculateValidMoves(BoardType board, bool simulateMoves) const
         if (simulateMoves || !resultsInCheck(targetY, m_x, board))
         {
             m_validMoves.emplace_back(board[targetY][m_x]);
-        
-            if (m_firstMove)
+        }
+        if (m_firstMove)
+        {
+            if ((targetY + direction) >= 0 && (targetY + direction) < BOARD_SIZE && board[targetY + direction][m_x].getPiece() == nullptr)
             {
-                if ((targetY + direction) >= 0 && (targetY + direction) < BOARD_SIZE && board[targetY + direction][m_x].getPiece() == nullptr)
-                {
-                    if (simulateMoves || !resultsInCheck(targetY + direction, m_x, board))
-                        m_validMoves.emplace_back(board[targetY + direction][m_x]);
-                }
+                if (simulateMoves || !resultsInCheck(targetY + direction, m_x, board))
+                    m_validMoves.emplace_back(board[targetY + direction][m_x]);
             }
         }
     }
