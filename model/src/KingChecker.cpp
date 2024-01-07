@@ -65,14 +65,9 @@ bool KingChecker::isKingInCheck(const King& king, const BoardType& board) const
     return false;
 }
 
-bool KingChecker::isCheckmate(const BoardType& board, PieceColor pieceColor) const
+GameReturnType KingChecker::isCheckmate(const BoardType& board, PieceColor pieceColor) const
 {
     std::shared_ptr<King> king = pieceColor == PieceColor::WHITE ? m_whiteKing : m_blackKing;
-    
-    if(!isKingInCheck(*king, board))
-    {
-        return false;
-    }
 
     for (int y = 0; y < BOARD_SIZE; y++)
     {
@@ -84,10 +79,16 @@ bool KingChecker::isCheckmate(const BoardType& board, PieceColor pieceColor) con
                 piece->calculateValidMoves(board);
                 if(!piece->getValidMoves().empty())
                 {
-                    return false;
+                    return GameReturnType::GAME_PENDING;
                 }
             }
         }
     }
-    return true;
+
+    if(!isKingInCheck(*king, board))
+    {
+        return GameReturnType::GAME_STALEMATE;
+    }
+
+    return GameReturnType::GAME_CHECKMATE;
 }

@@ -4,6 +4,7 @@
 #include <memory>
 #include "King.hpp"
 #include "Tile.hpp"
+#include "GameReturnType.hpp"
 
 class KingChecker 
 {
@@ -25,7 +26,7 @@ public:
 
     bool isWhiteKingInCheck(const BoardType& board) const;
     bool isBlackKingInCheck(const BoardType& board) const;
-    bool isCheckmate(const BoardType& board, PieceColor pieceColor) const;
+    GameReturnType isCheckmate(const BoardType& board, PieceColor pieceColor) const;
 };
 
 #endif

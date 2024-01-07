@@ -32,7 +32,7 @@ void BoardController::handleOnTilePressed(const std::shared_ptr<Tile>& tile)
     if (m_clickedTile)
     {
         std::shared_ptr<Piece> piece = m_clickedTile->getPiece();
-        if(piece)
+        if (piece)
         {
             if (piece->isValidMove(*tile, m_view.getBoard()))
             {
@@ -42,9 +42,15 @@ void BoardController::handleOnTilePressed(const std::shared_ptr<Tile>& tile)
                 tile->setPiece(piece);
 
                 m_currentTurn = (m_currentTurn == PieceColor::WHITE) ? PieceColor::BLACK : PieceColor::WHITE;
-                if(KingChecker::getInstance().isCheckmate(m_view.getBoard(), m_currentTurn))
+
+                GameReturnType gameResult = KingChecker::getInstance().isCheckmate(m_view.getBoard(), m_currentTurn);
+                if (gameResult == GameReturnType::GAME_CHECKMATE)
                 {
                     Logger::getInstance().log(LogLevel::INFO, "Checkmate! ", m_currentTurn == PieceColor::WHITE ? "BLACK" : "WHITE", " won.");
+                }
+                else if (gameResult == GameReturnType::GAME_STALEMATE)
+                {
+                    Logger::getInstance().log(LogLevel::INFO, "Stalemate! Draw.");
                 }
             }
             else

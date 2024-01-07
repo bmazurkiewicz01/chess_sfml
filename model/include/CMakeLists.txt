@@ -3,6 +3,7 @@ add_library(CHESS_MODEL_INCLUDE
     PieceColor.hpp
     PieceType.hpp
     KingChecker.hpp
+    GameReturnType.hpp
     Pawn.hpp
     King.hpp
     Queen.hpp
