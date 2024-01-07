@@ -1,5 +1,6 @@
 #include "King.hpp"
 #include "KingChecker.hpp"
+#include "Rook.hpp"
 
 King::King(sf::Texture& texture, int x, int y, PieceColor pieceColor) 
                         : Piece(texture, x, y, pieceColor, PieceType::KING), m_firstMove(true)
@@ -55,5 +56,97 @@ void King::calculateValidMoves(BoardType board, bool simulateMoves) const
             }
         }
     }
+
+    if (m_firstMove && !simulateMoves)
+    {
+        if (canCastleKingside(board))
+        {
+            Tile kingsideRookTile = board[m_y][BOARD_SIZE - 1];
+            BoardType kingsideCastlingBoard = board;
+            kingsideCastlingBoard[m_y][m_x + 1].setPiece(std::make_shared<King>(*this));
+            kingsideCastlingBoard[m_y][m_x + 1].setPiece(nullptr);
+
+            KingChecker& kingChecker = KingChecker::getInstance();
+            if (!kingChecker.isKingInCheck(*this, kingsideCastlingBoard) &&
+                !kingChecker.isKingInCheck(*this, board))
+            {
+                m_validMoves.emplace_back(board[m_y][m_x + 2]);
+            }
+        }
+
+        if (canCastleQueenside(board))
+        {
+            Tile queensideRookTile = board[m_y][0];
+            BoardType queensideCastlingBoard = board;
+            queensideCastlingBoard[m_y][m_x - 1].setPiece(std::make_shared<King>(*this));
+            queensideCastlingBoard[m_y][m_x - 1].setPiece(nullptr);
+
+            KingChecker& kingChecker = KingChecker::getInstance();
+            if (!kingChecker.isKingInCheck(*this, queensideCastlingBoard) &&
+                !kingChecker.isKingInCheck(*this, board))
+            {
+                m_validMoves.emplace_back(board[m_y][m_x - 2]);
+            }
+            
+        }
+    }
 }
 
+bool King::canCastleKingside(BoardType board) const
+{
+    if (!m_firstMove || KingChecker::getInstance().isKingInCheck(*this, board))
+        return false;
+
+    Tile kingsideRookTile = board[m_y][BOARD_SIZE - 1];
+
+    if (kingsideRookTile.getPiece() == nullptr || kingsideRookTile.getPiece()->getPieceType() != PieceType::ROOK)
+    {
+        return false;
+    }
+
+    std::shared_ptr<Rook> rook = std::dynamic_pointer_cast<Rook>(kingsideRookTile.getPiece());
+    if (!rook->isFirstMove())
+    {
+        return false;
+    }
+
+    for (int i = m_x + 1; i < BOARD_SIZE - 1; ++i)
+    {
+        if (board[m_y][i].getPiece() != nullptr || KingChecker::getInstance().isSquareUnderAttack(m_y, i, board, m_pieceColor))
+            return false;
+    }
+
+    BoardType simulatedBoard = board;
+    simulatedBoard[m_y][m_x + 1].setPiece(std::make_shared<King>(*this));
+    simulatedBoard[m_y][m_x].setPiece(nullptr);
+
+    if (KingChecker::getInstance().isKingInCheck(*this, simulatedBoard))
+        return false;
+
+    return true;
+}
+
+bool King::canCastleQueenside(BoardType board) const
+{
+    if (!m_firstMove || KingChecker::getInstance().isKingInCheck(*this, board))
+        return false;
+
+    Tile queensideRookTile = board[m_y][0];
+    if (queensideRookTile.getPiece() == nullptr /*|| !queensideRookTile.getPiece()->isFirstMove()*/)
+        return false;
+
+    for (int i = m_x - 1; i > 0; --i)
+    {
+        if (board[m_y][i].getPiece() != nullptr || KingChecker::getInstance().isSquareUnderAttack(m_y, i, board, m_pieceColor))
+            return false;
+    }
+
+    BoardType simulatedBoard = board;
+    simulatedBoard[m_y][m_x - 1].setPiece(std::make_shared<King>(*this));
+    simulatedBoard[m_y][m_x].setPiece(nullptr);
+
+    if (KingChecker::getInstance().isKingInCheck(*this, simulatedBoard))
+        return false;
+
+    return true;
+}

@@ -92,3 +92,27 @@ GameReturnType KingChecker::isCheckmate(const BoardType& board, PieceColor piece
 
     return GameReturnType::GAME_CHECKMATE;
 }
+
+bool KingChecker::isSquareUnderAttack(int y, int x, const BoardType& board, PieceColor pieceColor) const
+{
+    for (int i = 0; i < BOARD_SIZE; ++i)
+    {
+        for (int j = 0; j < BOARD_SIZE; ++j)
+        {
+            std::shared_ptr<Piece> piece = board[i][j].getPiece();
+            if (piece && piece->getPieceColor() != pieceColor)
+            {
+                piece->calculateValidMoves(board, true);
+                const auto& validMoves = piece->getValidMoves();
+                for (const auto& move : validMoves)
+                {
+                    if (move.getX() == x && move.getY() == y)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}

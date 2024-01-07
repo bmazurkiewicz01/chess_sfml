@@ -144,7 +144,7 @@ sf::RenderWindow& BoardView::getWindow()
     return m_window;
 }
 
-const BoardType& BoardView::getBoard() const 
+BoardType& BoardView::getBoard()
 {
     return m_board;
 }

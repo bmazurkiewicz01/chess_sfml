@@ -2,9 +2,24 @@
 #include "KingChecker.hpp"
 
 Rook::Rook(sf::Texture& pieceTexture, int x, int y, PieceColor pieceColor)
-    : Piece(pieceTexture, x, y, pieceColor, PieceType::ROOK)
+    : Piece(pieceTexture, x, y, pieceColor, PieceType::ROOK), m_firstMove(true)
 {
 
+}
+
+bool Rook::isValidMove(const Tile& tile, BoardType board, bool simulateMove) const
+{
+    auto it = std::find(m_validMoves.begin(), m_validMoves.end(), tile);
+    if (it == m_validMoves.end())
+    {
+        return false;
+    }
+    else
+    {
+        if (!simulateMove)
+            m_firstMove = false;
+        return true;
+    }
 }
 
 void Rook::calculateValidMoves(BoardType board, bool simulateMoves) const
@@ -54,4 +69,9 @@ void Rook::calculateValidMoves(BoardType board, bool simulateMoves) const
             }
         }
     }
+}
+
+bool Rook::isFirstMove()
+{
+    return m_firstMove;
 }

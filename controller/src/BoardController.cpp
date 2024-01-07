@@ -1,6 +1,7 @@
 #include "BoardController.hpp"
 #include "EventManager.hpp"
 #include "Piece.hpp"
+#include "Rook.hpp"
 #include "Logger.hpp"
 #include "KingChecker.hpp"
 
@@ -36,6 +37,37 @@ void BoardController::handleOnTilePressed(const std::shared_ptr<Tile>& tile)
         {
             if (piece->isValidMove(*tile, m_view.getBoard()))
             {
+                /* Castling logic. TODO: move it somewhere else */
+                if (piece->getPieceType() == PieceType::KING && std::abs(tile->getX() - piece->getPieceX()) == 2)
+                {
+                    if (tile->getX() < piece->getPieceX())
+                    {
+                        std::shared_ptr<Piece> rook = m_view.getBoard()[piece->getPieceY()][0].getPiece();
+                        if (rook->getPieceType() == PieceType::ROOK)
+                        {
+                            Tile& oldRookTile = m_view.getBoard()[piece->getPieceY()][0];
+                            oldRookTile.setPiece(nullptr);
+                            rook->setPieceX(tile->getX() + 1);
+
+                            Tile& newRookTile = m_view.getBoard()[piece->getPieceY()][tile->getX() + 1];
+                            newRookTile.setPiece(rook);
+                        }
+                    }
+                    else
+                    {
+                        std::shared_ptr<Piece> rook = m_view.getBoard()[piece->getPieceY()][7].getPiece();
+                        if (rook->getPieceType() == PieceType::ROOK)
+                        {
+                            Tile& oldRookTile = m_view.getBoard()[piece->getPieceY()][7];
+                            rook->setPieceX(tile->getX() - 1);
+
+                            Tile& newRookTile = m_view.getBoard()[piece->getPieceY()][tile->getX() - 1];
+                   
+                            newRookTile.setPiece(rook);
+                            oldRookTile.setPiece(nullptr);
+                        }
+                    }
+                }
                 m_clickedTile->setPiece(nullptr);
                 piece->setPieceX(tile->getX());
                 piece->setPieceY(tile->getY());

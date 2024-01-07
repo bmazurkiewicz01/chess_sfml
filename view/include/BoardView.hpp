@@ -24,7 +24,7 @@ public:
     void drawBoard() const;
     void drawMoveHint(std::vector<Tile> validMoves) const;
     sf::RenderWindow& getWindow();
-    const BoardType& getBoard() const;
+    BoardType& getBoard();
 };
 
 #endif

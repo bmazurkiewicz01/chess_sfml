@@ -27,6 +27,8 @@ public:
     bool isWhiteKingInCheck(const BoardType& board) const;
     bool isBlackKingInCheck(const BoardType& board) const;
     GameReturnType isCheckmate(const BoardType& board, PieceColor pieceColor) const;
+    bool isSquareUnderAttack(int y, int x, const BoardType& board, PieceColor pieceColor) const;
+
 };
 
 #endif
