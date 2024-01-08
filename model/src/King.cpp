@@ -105,7 +105,7 @@ bool King::canCastleKingside(BoardType board) const
     }
 
     std::shared_ptr<Rook> rook = std::dynamic_pointer_cast<Rook>(kingsideRookTile.getPiece());
-    if (!rook->isFirstMove())
+    if (rook != nullptr && !rook->isFirstMove())
     {
         return false;
     }
@@ -132,8 +132,16 @@ bool King::canCastleQueenside(BoardType board) const
         return false;
 
     Tile queensideRookTile = board[m_y][0];
-    if (queensideRookTile.getPiece() == nullptr /*|| !queensideRookTile.getPiece()->isFirstMove()*/)
+    if (queensideRookTile.getPiece() == nullptr || queensideRookTile.getPiece()->getPieceType() != PieceType::ROOK)
+    {
         return false;
+    }
+
+    std::shared_ptr<Rook> rook = std::dynamic_pointer_cast<Rook>(queensideRookTile.getPiece());
+    if (rook != nullptr && !rook->isFirstMove())
+    {
+        return false;
+    }
 
     for (int i = m_x - 1; i > 0; --i)
     {

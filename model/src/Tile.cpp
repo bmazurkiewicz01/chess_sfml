@@ -13,8 +13,6 @@ Tile::Tile(float size, float x, float y, sf::Color tileColor) : m_size(sf::Vecto
 
 void Tile::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-    // states.transform *= getTransform();
-
     sf::RectangleShape shape(m_size);
     shape.setFillColor(m_tileColor);
     shape.setPosition(getPosition());
@@ -22,8 +20,6 @@ void Tile::draw(sf::RenderTarget& target, sf::RenderStates states) const
 
     if (m_piece)
     {
-        // sf::Transform combinedTransform = states.transform * m_piece->getTransform();
-        // m_piece->setPosition(combinedTransform.transformPoint(sf::Vector2f(0, 0)));
         m_piece->setSize(m_size);
         m_piece->setPosition(getPosition());
         m_piece->draw(target, states);
