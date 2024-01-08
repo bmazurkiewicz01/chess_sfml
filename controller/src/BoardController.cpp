@@ -37,37 +37,11 @@ void BoardController::handleOnTilePressed(const std::shared_ptr<Tile>& tile)
         {
             if (piece->isValidMove(*tile, m_view.getBoard()))
             {
-                /* Castling logic. TODO: move it somewhere else */
-                if (piece->getPieceType() == PieceType::KING && std::abs(tile->getX() - piece->getPieceX()) == 2)
+                if (piece->getPieceType() == PieceType::KING)
                 {
-                    if (tile->getX() < piece->getPieceX())
-                    {
-                        std::shared_ptr<Piece> rook = m_view.getBoard()[piece->getPieceY()][0].getPiece();
-                        if (rook->getPieceType() == PieceType::ROOK)
-                        {
-                            Tile& oldRookTile = m_view.getBoard()[piece->getPieceY()][0];
-                            oldRookTile.setPiece(nullptr);
-                            rook->setPieceX(tile->getX() + 1);
-
-                            Tile& newRookTile = m_view.getBoard()[piece->getPieceY()][tile->getX() + 1];
-                            newRookTile.setPiece(rook);
-                        }
-                    }
-                    else
-                    {
-                        std::shared_ptr<Piece> rook = m_view.getBoard()[piece->getPieceY()][7].getPiece();
-                        if (rook->getPieceType() == PieceType::ROOK)
-                        {
-                            Tile& oldRookTile = m_view.getBoard()[piece->getPieceY()][7];
-                            rook->setPieceX(tile->getX() - 1);
-
-                            Tile& newRookTile = m_view.getBoard()[piece->getPieceY()][tile->getX() - 1];
-                   
-                            newRookTile.setPiece(rook);
-                            oldRookTile.setPiece(nullptr);
-                        }
-                    }
+                    checkKingCastling(tile, piece);
                 }
+
                 m_clickedTile->setPiece(nullptr);
                 piece->setPieceX(tile->getX());
                 piece->setPieceY(tile->getY());
@@ -117,6 +91,45 @@ void BoardController::handleOnTilePressed(const std::shared_ptr<Tile>& tile)
         else
         {
             Logger::getInstance().log(LogLevel::DEBUG, "There is no piece on this tile");
+        }
+    }
+}
+
+void BoardController::checkKingCastling(const std::shared_ptr<Tile>& tile, std::shared_ptr<Piece>& piece)
+{
+    if(tile == nullptr || piece == nullptr)
+    {
+        return;
+    }
+
+    if (std::abs(tile->getX() - piece->getPieceX()) == 2)
+    {
+        if (tile->getX() < piece->getPieceX())
+        {
+            std::shared_ptr<Piece> rook = m_view.getBoard()[piece->getPieceY()][0].getPiece();
+            if (rook->getPieceType() == PieceType::ROOK)
+            {
+                Tile& oldRookTile = m_view.getBoard()[piece->getPieceY()][0];
+                oldRookTile.setPiece(nullptr);
+                rook->setPieceX(tile->getX() + 1);
+
+                Tile& newRookTile = m_view.getBoard()[piece->getPieceY()][tile->getX() + 1];
+                newRookTile.setPiece(rook);
+            }
+        }
+        else
+        {
+            std::shared_ptr<Piece> rook = m_view.getBoard()[piece->getPieceY()][7].getPiece();
+            if (rook->getPieceType() == PieceType::ROOK)
+            {
+                Tile& oldRookTile = m_view.getBoard()[piece->getPieceY()][7];
+                rook->setPieceX(tile->getX() - 1);
+
+                Tile& newRookTile = m_view.getBoard()[piece->getPieceY()][tile->getX() - 1];
+        
+                newRookTile.setPiece(rook);
+                oldRookTile.setPiece(nullptr);
+            }
         }
     }
 }
