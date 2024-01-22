@@ -5,6 +5,8 @@ add_library(CHESS_MODEL_SRC
     King.cpp
     Queen.cpp
     Rook.cpp
+    Bishop.cpp
+    Knight.cpp
     Tile.cpp
 )
 

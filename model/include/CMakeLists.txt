@@ -8,6 +8,8 @@ add_library(CHESS_MODEL_INCLUDE
     King.hpp
     Queen.hpp
     Rook.hpp
+    Bishop.hpp
+    Knight.hpp
     Tile.hpp
 )
 
