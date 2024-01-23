@@ -7,6 +7,7 @@ class Pawn : public Piece
 {
 private:
     mutable bool m_firstMove;
+    mutable bool m_exposedOnEnPassant;
 
     bool isMovingForward(int y) const;
     bool canPromote(int y) const;
@@ -16,6 +17,9 @@ public:
 
     bool isValidMove(const Tile& tile, BoardType board, bool simulateMove = false) const override;
     void calculateValidMoves(BoardType board, bool simulateMoves = false) const override;
+
+    bool getExposedOnEnPassant() const;
+    void setExposedOnEnPassant(bool exposed) const;
 };
 
 #endif

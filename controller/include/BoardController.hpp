@@ -13,6 +13,7 @@ private:
     bool m_highlightValidMoves;
 
     void checkKingCastling(const std::shared_ptr<Tile>& tile, std::shared_ptr<Piece>& piece);
+    void checkEnPassant(const std::shared_ptr<Tile>& tile, std::shared_ptr<Piece>& piece);
 
 public:
     BoardController(BoardView& view);

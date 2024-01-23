@@ -8,6 +8,7 @@ add_library(CHESS_MODEL_SRC
     Bishop.cpp
     Knight.cpp
     Tile.cpp
+    EnPassantManager.cpp
 )
 
 target_link_libraries(CHESS_MODEL_SRC

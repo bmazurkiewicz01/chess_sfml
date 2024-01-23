@@ -11,6 +11,7 @@ add_library(CHESS_MODEL_INCLUDE
     Bishop.hpp
     Knight.hpp
     Tile.hpp
+    EnPassantManager.hpp
 )
 
 set_target_properties(CHESS_MODEL_INCLUDE PROPERTIES LINKER_LANGUAGE CXX)

@@ -1,9 +1,11 @@
 #include "BoardController.hpp"
 #include "EventManager.hpp"
 #include "Piece.hpp"
+#include "Pawn.hpp"
 #include "Rook.hpp"
 #include "Logger.hpp"
 #include "KingChecker.hpp"
+#include "EnPassantManager.hpp"
 
 BoardController::BoardController(BoardView& view) : m_view(view), m_clickedTile(nullptr), m_highlightValidMoves(false), m_currentTurn(PieceColor::WHITE)
 {
@@ -40,6 +42,14 @@ void BoardController::handleOnTilePressed(const std::shared_ptr<Tile>& tile)
                 if (piece->getPieceType() == PieceType::KING)
                 {
                     checkKingCastling(tile, piece);
+                }
+                else if (piece->getPieceType() == PieceType::PAWN)
+                {
+                    checkEnPassant(tile, piece);
+                }
+                else
+                {
+                    EnPassantManager::getInstance().popPawn();
                 }
 
                 m_clickedTile->setPiece(nullptr);
@@ -131,5 +141,33 @@ void BoardController::checkKingCastling(const std::shared_ptr<Tile>& tile, std::
                 oldRookTile.setPiece(nullptr);
             }
         }
+    }
+}
+
+void BoardController::checkEnPassant(const std::shared_ptr<Tile>& tile, std::shared_ptr<Piece>& piece)
+{
+    if(tile == nullptr || piece == nullptr)
+    {
+        return;
+    }
+
+    if (std::abs(piece->getPieceY() - tile->getY()) == 1 && std::abs(piece->getPieceX() - tile->getX()) == 1)
+    {
+        int direction = (piece->getPieceColor() == PieceColor::WHITE) ? -1 : 1;
+        int targetY = tile->getY() - direction;
+
+        if (targetY >= 0 && targetY < BOARD_SIZE && tile->getX() >= 0 && tile->getX() < BOARD_SIZE)
+        {
+            Tile& pieceTile = m_view.getBoard()[targetY][tile->getX()];
+            std::shared_ptr<Piece> targetPiece = pieceTile.getPiece();
+
+            if (targetPiece && targetPiece->getPieceType() == PieceType::PAWN &&
+                targetPiece->getPieceColor() != piece->getPieceColor() &&
+                std::static_pointer_cast<Pawn>(targetPiece)->getExposedOnEnPassant())
+            {
+                pieceTile.setPiece(nullptr);
+            }
+        }
+        EnPassantManager::getInstance().popPawn(); 
     }
 }
