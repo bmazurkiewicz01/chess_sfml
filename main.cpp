@@ -8,7 +8,7 @@ int main()
     TextureManager textureManager;
     
     BoardView boardView(window, textureManager);
-    boardView.initializeBoard();
+    boardView.initializeBoard(PieceColor::BLACK);
 
     BoardController boardController(boardView);
     boardController.run();

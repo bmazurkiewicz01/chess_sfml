@@ -45,7 +45,15 @@ void BoardController::handleOnTilePressed(const std::shared_ptr<Tile>& tile)
                 }
                 else if (piece->getPieceType() == PieceType::PAWN)
                 {
-                    checkEnPassant(tile, piece);
+                    std::shared_ptr<Pawn> pawn = std::dynamic_pointer_cast<Pawn>(piece);
+                    if (pawn == nullptr)
+                    {
+                        Logger::getInstance().log(LogLevel::ERROR, "Invalid piece type");
+                    }
+                    else
+                    {
+                        checkEnPassant(tile, pawn);
+                    }
                 }
                 else
                 {
@@ -144,7 +152,7 @@ void BoardController::checkKingCastling(const std::shared_ptr<Tile>& tile, std::
     }
 }
 
-void BoardController::checkEnPassant(const std::shared_ptr<Tile>& tile, std::shared_ptr<Piece>& piece)
+void BoardController::checkEnPassant(const std::shared_ptr<Tile>& tile, std::shared_ptr<Pawn>& piece)
 {
     if(tile == nullptr || piece == nullptr)
     {
@@ -153,7 +161,8 @@ void BoardController::checkEnPassant(const std::shared_ptr<Tile>& tile, std::sha
 
     if (std::abs(piece->getPieceY() - tile->getY()) == 1 && std::abs(piece->getPieceX() - tile->getX()) == 1)
     {
-        int direction = (piece->getPieceColor() == PieceColor::WHITE) ? -1 : 1;
+        
+        int direction = piece->getDirection();
         int targetY = tile->getY() - direction;
 
         if (targetY >= 0 && targetY < BOARD_SIZE && tile->getX() >= 0 && tile->getX() < BOARD_SIZE)

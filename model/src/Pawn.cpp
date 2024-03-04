@@ -2,8 +2,8 @@
 #include "Logger.hpp"
 #include "EnPassantManager.hpp"
 
-Pawn::Pawn(sf::Texture& texture, int x, int y, PieceColor pieceColor) 
-                        : Piece(texture, x, y, pieceColor, PieceType::PAWN), m_firstMove(true), m_exposedOnEnPassant(false)
+Pawn::Pawn(sf::Texture& texture, int x, int y, PieceColor pieceColor, int direction) 
+                        : Piece(texture, x, y, pieceColor, PieceType::PAWN), m_firstMove(true), m_exposedOnEnPassant(false), m_direction(direction)
 {
     
 }
@@ -12,7 +12,7 @@ bool Pawn::isMovingForward(int y) const
 {
     bool result = false;
 
-    if (m_pieceColor == PieceColor::WHITE)
+    if (m_direction == -1)
     {
         result = y < m_y;
     }
@@ -28,7 +28,7 @@ bool Pawn::canPromote(int y) const
 {
     bool result = false;
 
-    if (m_pieceColor == PieceColor::WHITE)
+    if (m_direction == -1)
     {
         result = y == 0;
     }
@@ -41,7 +41,7 @@ bool Pawn::canPromote(int y) const
 
 bool Pawn::isPathClear(int y, BoardType board) const
 {
-    if (m_pieceColor == PieceColor::WHITE)
+    if (m_direction == -1)
     {
         for (int boardY = m_y - 1; boardY > y; boardY--) {
             if (board[boardY][m_x].getPiece() != nullptr) 
@@ -87,9 +87,7 @@ void Pawn::calculateValidMoves(BoardType board, bool simulateMoves) const
 {
     m_validMoves.clear();
 
-    int direction = (m_pieceColor == PieceColor::WHITE) ? -1 : 1;
-
-    int targetY = m_y + direction;
+    int targetY = m_y + m_direction;
 
     if (targetY >= 0 && targetY < BOARD_SIZE)
     {
@@ -97,9 +95,9 @@ void Pawn::calculateValidMoves(BoardType board, bool simulateMoves) const
         {
             int targetX = m_x + deltaX;
 
-            if (targetX >= 0 && targetX < BOARD_SIZE && targetY - direction >= 0 && targetY - direction < BOARD_SIZE)
+            if (targetX >= 0 && targetX < BOARD_SIZE && targetY - m_direction >= 0 && targetY - m_direction < BOARD_SIZE)
             {
-                std::shared_ptr<Piece> targetPiece = board[targetY - direction][targetX].getPiece();
+                std::shared_ptr<Piece> targetPiece = board[targetY - m_direction][targetX].getPiece();
                 if (targetPiece && targetPiece->getPieceType() == PieceType::PAWN &&
                     targetPiece->getPieceColor() != m_pieceColor &&
                     std::static_pointer_cast<Pawn>(targetPiece)->getExposedOnEnPassant())
@@ -118,10 +116,10 @@ void Pawn::calculateValidMoves(BoardType board, bool simulateMoves) const
         }
         if (m_firstMove)
         {
-            if ((targetY + direction) >= 0 && (targetY + direction) < BOARD_SIZE && board[targetY + direction][m_x].getPiece() == nullptr)
+            if ((targetY + m_direction) >= 0 && (targetY + m_direction) < BOARD_SIZE && board[targetY + m_direction][m_x].getPiece() == nullptr)
             {
-                if (simulateMoves || !resultsInCheck(targetY + direction, m_x, board))
-                    m_validMoves.emplace_back(board[targetY + direction][m_x]);
+                if (simulateMoves || !resultsInCheck(targetY + m_direction, m_x, board))
+                    m_validMoves.emplace_back(board[targetY + m_direction][m_x]);
             }
         }
     }
@@ -149,4 +147,9 @@ bool Pawn::getExposedOnEnPassant() const
 void Pawn::setExposedOnEnPassant(bool exposed) const
 {
     m_exposedOnEnPassant = exposed;
+}
+
+int Pawn::getDirection() const
+{
+    return m_direction;
 }

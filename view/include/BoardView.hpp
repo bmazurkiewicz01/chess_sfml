@@ -15,11 +15,14 @@ private:
     BoardType m_board;
     TextureManager m_textureManager;
     
+    void initializePawn(PieceColor color, int x, int y, int direction);
+    void initializeBackRow(PieceColor color, int y);
+    PieceColor getOppositeColor(PieceColor color) const;
 
 public:
     BoardView(sf::RenderWindow& window, TextureManager textureManager);
 
-    void initializeBoard();
+    void initializeBoard(PieceColor playerColor);
     void handleEvents();
     void drawBoard() const;
     void drawMoveHint(std::vector<Tile> validMoves) const;

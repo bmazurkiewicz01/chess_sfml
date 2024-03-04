@@ -14,7 +14,7 @@ BoardView::BoardView(sf::RenderWindow& window, TextureManager textureManager) : 
     
 }
 
-void BoardView::initializeBoard()
+void BoardView::initializeBoard(PieceColor playerColor)
 {
     m_window.setFramerateLimit(60);
     m_textureManager.loadPieceTexture(PieceType::PAWN, PieceColor::WHITE, "../resources/white-pawn.png");
@@ -30,7 +30,6 @@ void BoardView::initializeBoard()
     m_textureManager.loadPieceTexture(PieceType::KNIGHT, PieceColor::WHITE, "../resources/white-knight.png");
     m_textureManager.loadPieceTexture(PieceType::KNIGHT, PieceColor::BLACK, "../resources/black-knight.png");
 
-
     for (int y = 0; y < BOARD_SIZE; y++)
     {
         for (int x = 0; x < BOARD_SIZE; x++)
@@ -38,67 +37,60 @@ void BoardView::initializeBoard()
             sf::Color tileColor = (x + y) % 2 == 0 ? WHITE_TILE_COLOR : BLACK_TILE_COLOR;
             m_board[y][x] = Tile(100.f, x, y, tileColor);
 
-            if(y == 1)
-            {
-                Pawn pawn(m_textureManager.getPieceTexture(PieceType::PAWN, PieceColor::BLACK), x, y, PieceColor::BLACK);
-                m_board[y][x].setPiece(std::make_shared<Pawn>(pawn));
-            }
-            else if(y == 6)
-            {
-                Pawn pawn(m_textureManager.getPieceTexture(PieceType::PAWN, PieceColor::WHITE), x, y, PieceColor::WHITE);
-                m_board[y][x].setPiece(std::make_shared<Pawn>(pawn));
-            }
+            initializePawn(playerColor, x, 6, -1);
+            initializePawn(getOppositeColor(playerColor), x, 1, 1);
         }
     }
 
-    King whiteKing(m_textureManager.getPieceTexture(PieceType::KING, PieceColor::WHITE), 4, 7, PieceColor::WHITE);
-    std::shared_ptr<King> whiteKingPtr = std::make_shared<King>(whiteKing);
-    m_board[7][4].setPiece(whiteKingPtr);
+    initializeBackRow(playerColor, 7);
+    initializeBackRow(getOppositeColor(playerColor), 0);
+}
 
-    King blackKing(m_textureManager.getPieceTexture(PieceType::KING, PieceColor::BLACK), 4, 0, PieceColor::BLACK);
-    std::shared_ptr<King> blackKingPtr = std::make_shared<King>(blackKing);
-    m_board[0][4].setPiece(blackKingPtr);
+void BoardView::initializePawn(PieceColor color, int x, int y, int direction)
+{
+    Pawn pawn(m_textureManager.getPieceTexture(PieceType::PAWN, color), x, y, color, direction);
+    m_board[y][x].setPiece(std::make_shared<Pawn>(pawn));
+}
 
-    KingChecker::getInstance().setWhiteKing(whiteKingPtr);
-    KingChecker::getInstance().setBlackKing(blackKingPtr);
+void BoardView::initializeBackRow(PieceColor color, int y)
+{
+    Rook rook1(m_textureManager.getPieceTexture(PieceType::ROOK, color), 0, y, color);
+    m_board[y][0].setPiece(std::make_shared<Rook>(rook1));
 
-    Queen whiteQueen(m_textureManager.getPieceTexture(PieceType::QUEEN, PieceColor::WHITE), 3, 7, PieceColor::WHITE);
-    m_board[7][3].setPiece(std::make_shared<Queen>(whiteQueen));
+    Knight knight1(m_textureManager.getPieceTexture(PieceType::KNIGHT, color), 1, y, color);
+    m_board[y][1].setPiece(std::make_shared<Knight>(knight1));
 
-    Queen blackQueen(m_textureManager.getPieceTexture(PieceType::QUEEN, PieceColor::BLACK), 3, 0, PieceColor::BLACK);
-    m_board[0][3].setPiece(std::make_shared<Queen>(blackQueen));
+    Bishop bishop1(m_textureManager.getPieceTexture(PieceType::BISHOP, color), 2, y, color);
+    m_board[y][2].setPiece(std::make_shared<Bishop>(bishop1));
 
-    Rook whiteRook1(m_textureManager.getPieceTexture(PieceType::ROOK, PieceColor::WHITE), 0, 7, PieceColor::WHITE);
-    m_board[7][0].setPiece(std::make_shared<Rook>(whiteRook1));
+    Queen queen(m_textureManager.getPieceTexture(PieceType::QUEEN, color), 3, y, color);
+    m_board[y][3].setPiece(std::make_shared<Queen>(queen));
 
-    Rook whiteRook2(m_textureManager.getPieceTexture(PieceType::ROOK, PieceColor::WHITE), 7, 7, PieceColor::WHITE);
-    m_board[7][7].setPiece(std::make_shared<Rook>(whiteRook2));
+    King king(m_textureManager.getPieceTexture(PieceType::KING, color), 4, y, color);
+    m_board[y][4].setPiece(std::make_shared<King>(king));
 
-    Rook blackRook1(m_textureManager.getPieceTexture(PieceType::ROOK, PieceColor::BLACK), 0, 0, PieceColor::BLACK);
-    m_board[0][0].setPiece(std::make_shared<Rook>(blackRook1));
+    if (color == PieceColor::WHITE)
+    {
+        KingChecker::getInstance().setWhiteKing(std::make_shared<King>(king));
+    }
+    else
+    {
+        KingChecker::getInstance().setBlackKing(std::make_shared<King>(king));
+    }
 
-    Rook blackRook2(m_textureManager.getPieceTexture(PieceType::ROOK, PieceColor::BLACK), 7, 0, PieceColor::BLACK);
-    m_board[0][7].setPiece(std::make_shared<Rook>(blackRook2));
+    Bishop bishop2(m_textureManager.getPieceTexture(PieceType::BISHOP, color), 5, y, color);
+    m_board[y][5].setPiece(std::make_shared<Bishop>(bishop2));
 
-    Bishop whiteBishop1(m_textureManager.getPieceTexture(PieceType::BISHOP, PieceColor::WHITE), 2, 7, PieceColor::WHITE);
-    m_board[7][2].setPiece(std::make_shared<Bishop>(whiteBishop1));
-    Bishop whiteBishop2(m_textureManager.getPieceTexture(PieceType::BISHOP, PieceColor::WHITE), 5, 7, PieceColor::WHITE);
-    m_board[7][5].setPiece(std::make_shared<Bishop>(whiteBishop2));
+    Knight knight2(m_textureManager.getPieceTexture(PieceType::KNIGHT, color), 6, y, color);
+    m_board[y][6].setPiece(std::make_shared<Knight>(knight2));
 
-    Bishop blackBishop1(m_textureManager.getPieceTexture(PieceType::BISHOP, PieceColor::BLACK), 2, 0, PieceColor::BLACK);
-    m_board[0][2].setPiece(std::make_shared<Bishop>(blackBishop1));
-    Bishop blackBishop2(m_textureManager.getPieceTexture(PieceType::BISHOP, PieceColor::BLACK), 5, 0, PieceColor::BLACK);
-    m_board[0][5].setPiece(std::make_shared<Bishop>(blackBishop2));
+    Rook rook2(m_textureManager.getPieceTexture(PieceType::ROOK, color), 7, y, color);
+    m_board[y][7].setPiece(std::make_shared<Rook>(rook2));
+}
 
-    Knight whiteKnight1(m_textureManager.getPieceTexture(PieceType::KNIGHT, PieceColor::WHITE), 1, 7, PieceColor::WHITE);
-    m_board[7][1].setPiece(std::make_shared<Knight>(whiteKnight1));
-    Knight whiteKnight2(m_textureManager.getPieceTexture(PieceType::KNIGHT, PieceColor::WHITE), 6, 7, PieceColor::WHITE);
-    m_board[7][6].setPiece(std::make_shared<Knight>(whiteKnight2));
-
-    Knight blackKnight1(m_textureManager.getPieceTexture(PieceType::KNIGHT, PieceColor::BLACK), 1, 0, PieceColor::BLACK);
-    m_board[0][1].setPiece(std::make_shared<Knight>(blackKnight1));
-    Knight blackKnight2(m_textureManager.getPieceTexture(PieceType::KNIGHT, PieceColor::BLACK), 6, 0, PieceColor::BLACK);
-    m_board[0][6].setPiece(std::make_shared<Knight>(blackKnight2));
+PieceColor BoardView::getOppositeColor(PieceColor color) const
+{
+    return color == PieceColor::WHITE ? PieceColor::BLACK : PieceColor::WHITE;
 }
 
 void BoardView::handleEvents()

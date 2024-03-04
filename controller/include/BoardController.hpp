@@ -4,6 +4,7 @@
 #include <memory>
 #include "BoardView.hpp"
 #include "PieceColor.hpp"
+#include "Pawn.hpp"
 
 class BoardController {
 private:
@@ -13,7 +14,7 @@ private:
     bool m_highlightValidMoves;
 
     void checkKingCastling(const std::shared_ptr<Tile>& tile, std::shared_ptr<Piece>& piece);
-    void checkEnPassant(const std::shared_ptr<Tile>& tile, std::shared_ptr<Piece>& piece);
+    void checkEnPassant(const std::shared_ptr<Tile>& tile, std::shared_ptr<Pawn>& piece);
 
 public:
     BoardController(BoardView& view);
