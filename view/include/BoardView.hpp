@@ -28,6 +28,7 @@ public:
     void drawMoveHint(std::vector<Tile> validMoves) const;
     sf::RenderWindow& getWindow();
     BoardType& getBoard();
+    TextureManager& getTextureManager();
 };
 
 #endif

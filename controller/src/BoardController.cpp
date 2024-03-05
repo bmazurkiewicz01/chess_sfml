@@ -3,11 +3,15 @@
 #include "Piece.hpp"
 #include "Pawn.hpp"
 #include "Rook.hpp"
+#include "Queen.hpp"
+#include "Bishop.hpp"
+#include "Knight.hpp"
 #include "Logger.hpp"
 #include "KingChecker.hpp"
 #include "EnPassantManager.hpp"
+#include "PromotionModalView.hpp"
 
-BoardController::BoardController(BoardView& view) : m_view(view), m_clickedTile(nullptr), m_highlightValidMoves(false), m_currentTurn(PieceColor::WHITE)
+BoardController::BoardController(BoardView& view) : m_view(view), m_clickedTile(nullptr), m_highlightValidMoves(false), m_currentTurn(PieceColor::WHITE), m_isPawnPromotionDialogActive(false), m_promotionModalData(nullptr), m_promotionModalView(nullptr)    
 {
     EventManager::getInstance().subscribe<Tile>(EventType::ON_TILE_PRESSED, [this](const std::shared_ptr<Tile>& tile) {
         this->handleOnTilePressed(tile);
@@ -17,11 +21,40 @@ BoardController::BoardController(BoardView& view) : m_view(view), m_clickedTile(
 void BoardController::run() 
 {
     while (m_view.getWindow().isOpen()) 
-    {
+    {                        handleTurnState();
+                        handleTileState();
+        if (m_isPawnPromotionDialogActive && m_promotionModalData != nullptr)
+        {
+            sf::Event event;
+            while (m_view.getWindow().pollEvent(event)) {
+                if (event.type == sf::Event::MouseButtonPressed) 
+                {
+                    m_promotionModalView->handleEvent(event);
+                    bool promotionResult = promotePawn(m_promotionModalView->getChoice());
+                    if (promotionResult)
+                    {
+                        if (m_clickedTile != nullptr)
+                        {
+                            m_clickedTile->setPiece(nullptr);  
+                        } 
+                        handleTurnState();
+                        handleTileState();
+                    }
+                    m_isPawnPromotionDialogActive = false;
+                    m_promotionModalData = nullptr;
+                    m_promotionModalView = nullptr;
+                }
+            }
+        }
+
         m_view.handleEvents();
         m_view.drawBoard();
 
-        if (m_highlightValidMoves && m_clickedTile && m_clickedTile->getPiece())
+        if (m_isPawnPromotionDialogActive && m_promotionModalView != nullptr)
+        {
+            m_promotionModalView->draw();
+        }
+        else if (m_highlightValidMoves && m_clickedTile && m_clickedTile->getPiece())
         {
             m_view.drawMoveHint(m_clickedTile->getPiece()->getValidMoves());
         }
@@ -53,6 +86,15 @@ void BoardController::handleOnTilePressed(const std::shared_ptr<Tile>& tile)
                     else
                     {
                         checkEnPassant(tile, pawn);
+
+                        if (pawn->canPromote(tile->getY()))
+                        {
+                            Logger::getInstance().log(LogLevel::DEBUG, "Pawn promotion");
+                            m_isPawnPromotionDialogActive = true;
+                            m_promotionModalData = std::make_unique<PromotionModalData>(PromotionModalData{tile, pawn});
+                            m_promotionModalView = std::make_unique<PromotionModalView>(m_view.getWindow(), m_view.getTextureManager(), m_promotionModalData->promotionPawn->getPieceColor(), m_promotionModalData->clickedTile->getPosition());
+                            return;
+                        }
                     }
                 }
                 else
@@ -64,28 +106,15 @@ void BoardController::handleOnTilePressed(const std::shared_ptr<Tile>& tile)
                 piece->setPieceX(tile->getX());
                 piece->setPieceY(tile->getY());
                 tile->setPiece(piece);
-
-                m_currentTurn = (m_currentTurn == PieceColor::WHITE) ? PieceColor::BLACK : PieceColor::WHITE;
-
-                GameReturnType gameResult = KingChecker::getInstance().isCheckmate(m_view.getBoard(), m_currentTurn);
-                if (gameResult == GameReturnType::GAME_CHECKMATE)
-                {
-                    Logger::getInstance().log(LogLevel::INFO, "Checkmate! ", m_currentTurn == PieceColor::WHITE ? "BLACK" : "WHITE", " won.");
-                }
-                else if (gameResult == GameReturnType::GAME_STALEMATE)
-                {
-                    Logger::getInstance().log(LogLevel::INFO, "Stalemate! Draw.");
-                }
+                
+                handleTurnState();
             }
             else
             {
                 Logger::getInstance().log(LogLevel::ERROR, "Invalid move");
             }
         }
-        sf::Color oldTileColor = m_clickedTile->getColor() == WHITE_TILE_HIGHLIGHT_COLOR ? WHITE_TILE_COLOR : BLACK_TILE_COLOR;
-        m_clickedTile->setColor(oldTileColor);
-        m_clickedTile = nullptr;
-        m_highlightValidMoves = false;
+        handleTileState();
     }
     else
     {
@@ -178,5 +207,83 @@ void BoardController::checkEnPassant(const std::shared_ptr<Tile>& tile, std::sha
             }
         }
         EnPassantManager::getInstance().popPawn(); 
+    }
+}
+
+bool BoardController::promotePawn(PromotionChoice choice)
+{
+    if (m_promotionModalData == nullptr)
+    {
+        Logger::getInstance().log(LogLevel::ERROR, "Invalid promotion choice, no model data");
+        return false;
+    }
+
+    std::shared_ptr<Pawn> promotionPawn = m_promotionModalData->promotionPawn;
+    std::shared_ptr<Tile> clickedTile = m_promotionModalData->clickedTile;
+
+    std::shared_ptr<Piece> newPiece;
+    switch (choice) {
+        case PromotionChoice::Queen:
+        {
+            Queen queen(m_view.getTextureManager().getPieceTexture(PieceType::QUEEN, promotionPawn->getPieceColor()), clickedTile->getX(), clickedTile->getY(), promotionPawn->getPieceColor());
+            newPiece = std::make_shared<Queen>(queen);
+            break;
+        }
+        case PromotionChoice::Rook:
+        {
+            Rook rook(m_view.getTextureManager().getPieceTexture(PieceType::ROOK, promotionPawn->getPieceColor()), clickedTile->getX(), clickedTile->getY(), promotionPawn->getPieceColor());
+            newPiece = std::make_shared<Rook>(rook);
+            break;
+        }
+        case PromotionChoice::Bishop:
+        {
+            Bishop bishop(m_view.getTextureManager().getPieceTexture(PieceType::BISHOP, promotionPawn->getPieceColor()), clickedTile->getX(), clickedTile->getY(), promotionPawn->getPieceColor());
+            newPiece = std::make_shared<Bishop>(bishop);
+            break;
+        }
+        case PromotionChoice::Knight:
+        {
+            Knight knight(m_view.getTextureManager().getPieceTexture(PieceType::KNIGHT, promotionPawn->getPieceColor()), clickedTile->getX(), clickedTile->getY(), promotionPawn->getPieceColor());
+            newPiece = std::make_shared<Knight>(knight);
+            break;
+        }
+        default:
+            break; 
+    }
+
+    if (newPiece) 
+    {
+        m_promotionModalData->clickedTile->setPiece(newPiece);
+        Logger::getInstance().log(LogLevel::DEBUG, "Promoted pawn to ", choice == PromotionChoice::Queen ? "Queen" : choice == PromotionChoice::Rook ? "Rook" : choice == PromotionChoice::Bishop ? "Bishop" : "Knight");
+        return true;
+    }
+
+    Logger::getInstance().log(LogLevel::ERROR, "Invalid promotion choice");
+    return false;
+}
+
+void BoardController::handleTurnState()
+{
+    m_currentTurn = (m_currentTurn == PieceColor::WHITE) ? PieceColor::BLACK : PieceColor::WHITE;
+
+    GameReturnType gameResult = KingChecker::getInstance().isCheckmate(m_view.getBoard(), m_currentTurn);
+    if (gameResult == GameReturnType::GAME_CHECKMATE)
+    {
+        Logger::getInstance().log(LogLevel::DEBUG, "Checkmate! ", m_currentTurn == PieceColor::WHITE ? "BLACK" : "WHITE", " won.");
+    }
+    else if (gameResult == GameReturnType::GAME_STALEMATE)
+    {
+        Logger::getInstance().log(LogLevel::DEBUG, "Stalemate! Draw.");
+    }
+}
+
+void BoardController::handleTileState()
+{
+    if (m_clickedTile)
+    {
+        sf::Color oldTileColor = m_clickedTile->getColor() == WHITE_TILE_HIGHLIGHT_COLOR ? WHITE_TILE_COLOR : BLACK_TILE_COLOR;
+        m_clickedTile->setColor(oldTileColor);
+        m_clickedTile = nullptr;
+        m_highlightValidMoves = false;
     }
 }

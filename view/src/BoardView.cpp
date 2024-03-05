@@ -44,6 +44,10 @@ void BoardView::initializeBoard(PieceColor playerColor)
 
     initializeBackRow(playerColor, 7);
     initializeBackRow(getOppositeColor(playerColor), 0);
+
+    // debug
+    Pawn pawn(m_textureManager.getPieceTexture(PieceType::PAWN, PieceColor::WHITE), 2, 1, PieceColor::WHITE, -1);
+    m_board[1][2].setPiece(std::make_shared<Pawn>(pawn));
 }
 
 void BoardView::initializePawn(PieceColor color, int x, int y, int direction)
@@ -165,4 +169,9 @@ sf::RenderWindow& BoardView::getWindow()
 BoardType& BoardView::getBoard()
 {
     return m_board;
+}
+
+TextureManager& BoardView::getTextureManager()
+{
+    return m_textureManager;
 }

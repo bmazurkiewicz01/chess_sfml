@@ -1,6 +1,8 @@
 add_library(CHESS_VIEW_INCLUDE
     BoardView.hpp
     TextureManager.hpp
+    PromotionChoice.hpp
+    PromotionModalView.hpp
 )
 
 set_target_properties(CHESS_VIEW_INCLUDE PROPERTIES LINKER_LANGUAGE CXX)
