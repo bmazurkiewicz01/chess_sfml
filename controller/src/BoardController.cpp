@@ -68,7 +68,10 @@ void BoardController::handleOnTilePressed(const std::shared_ptr<Tile>& tile)
                         if (pawn->canPromote(tile->getY()))
                         {
                             Logger::getInstance().log(LogLevel::DEBUG, "Pawn promotion");
-                            m_view.createPromotionDialog(pawn->getPieceColor(), tile->getPosition());
+
+                            sf::Vector2f position = pawn->getDirection() == -1 ? tile->getPosition() : sf::Vector2f(tile->getPosition().x, tile->getPosition().y - 300);
+
+                            m_view.createPromotionDialog(pawn->getPieceColor(), position);
                             m_isPawnPromotionDialogActive = true;
                             m_promotionModalData = std::make_unique<PromotionModalData>(PromotionModalData{tile, pawn});
                             return;
