@@ -5,7 +5,6 @@
 #include "BoardView.hpp"
 #include "PieceColor.hpp"
 #include "Pawn.hpp"
-#include "PromotionModalView.hpp"
 #include "PromotionModalData.hpp"
 #include "PromotionChoice.hpp"
 
@@ -17,7 +16,6 @@ private:
     bool m_highlightValidMoves;
     bool m_isPawnPromotionDialogActive;
     std::unique_ptr<PromotionModalData> m_promotionModalData;
-    std::unique_ptr<PromotionModalView> m_promotionModalView;
 
     void checkKingCastling(const std::shared_ptr<Tile>& tile, std::shared_ptr<Piece>& piece);
     void checkEnPassant(const std::shared_ptr<Tile>& tile, std::shared_ptr<Pawn>& piece);

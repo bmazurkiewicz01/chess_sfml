@@ -11,48 +11,26 @@
 #include "EnPassantManager.hpp"
 #include "PromotionModalView.hpp"
 
-BoardController::BoardController(BoardView& view) : m_view(view), m_clickedTile(nullptr), m_highlightValidMoves(false), m_currentTurn(PieceColor::WHITE), m_isPawnPromotionDialogActive(false), m_promotionModalData(nullptr), m_promotionModalView(nullptr)    
+BoardController::BoardController(BoardView& view) : m_view(view), m_clickedTile(nullptr), m_highlightValidMoves(false), m_currentTurn(PieceColor::WHITE), m_isPawnPromotionDialogActive(false), m_promotionModalData(nullptr) 
 {
     EventManager::getInstance().subscribe<Tile>(EventType::ON_TILE_PRESSED, [this](const std::shared_ptr<Tile>& tile) {
         this->handleOnTilePressed(tile);
+    });
+    EventManager::getInstance().subscribe<PromotionChoice>(EventType::ON_PAWN_PROMOTION, [this](const std::shared_ptr<PromotionChoice>& choice) {
+        this->promotePawn(*choice);
     });
 }
 
 void BoardController::run() 
 {
     while (m_view.getWindow().isOpen()) 
-    {                        handleTurnState();
-                        handleTileState();
-        if (m_isPawnPromotionDialogActive && m_promotionModalData != nullptr)
-        {
-            sf::Event event;
-            while (m_view.getWindow().pollEvent(event)) {
-                if (event.type == sf::Event::MouseButtonPressed) 
-                {
-                    m_promotionModalView->handleEvent(event);
-                    bool promotionResult = promotePawn(m_promotionModalView->getChoice());
-                    if (promotionResult)
-                    {
-                        if (m_clickedTile != nullptr)
-                        {
-                            m_clickedTile->setPiece(nullptr);  
-                        } 
-                        handleTurnState();
-                        handleTileState();
-                    }
-                    m_isPawnPromotionDialogActive = false;
-                    m_promotionModalData = nullptr;
-                    m_promotionModalView = nullptr;
-                }
-            }
-        }
-
+    {                        
         m_view.handleEvents();
         m_view.drawBoard();
 
-        if (m_isPawnPromotionDialogActive && m_promotionModalView != nullptr)
+        if (m_isPawnPromotionDialogActive)
         {
-            m_promotionModalView->draw();
+            m_view.drawPromotionDialog();
         }
         else if (m_highlightValidMoves && m_clickedTile && m_clickedTile->getPiece())
         {
@@ -90,9 +68,9 @@ void BoardController::handleOnTilePressed(const std::shared_ptr<Tile>& tile)
                         if (pawn->canPromote(tile->getY()))
                         {
                             Logger::getInstance().log(LogLevel::DEBUG, "Pawn promotion");
+                            m_view.createPromotionDialog(pawn->getPieceColor(), tile->getPosition());
                             m_isPawnPromotionDialogActive = true;
                             m_promotionModalData = std::make_unique<PromotionModalData>(PromotionModalData{tile, pawn});
-                            m_promotionModalView = std::make_unique<PromotionModalView>(m_view.getWindow(), m_view.getTextureManager(), m_promotionModalData->promotionPawn->getPieceColor(), m_promotionModalData->clickedTile->getPosition());
                             return;
                         }
                     }
@@ -106,7 +84,7 @@ void BoardController::handleOnTilePressed(const std::shared_ptr<Tile>& tile)
                 piece->setPieceX(tile->getX());
                 piece->setPieceY(tile->getY());
                 tile->setPiece(piece);
-                
+
                 handleTurnState();
             }
             else
@@ -218,6 +196,8 @@ bool BoardController::promotePawn(PromotionChoice choice)
         return false;
     }
 
+
+    bool result = false;
     std::shared_ptr<Pawn> promotionPawn = m_promotionModalData->promotionPawn;
     std::shared_ptr<Tile> clickedTile = m_promotionModalData->clickedTile;
 
@@ -254,12 +234,22 @@ bool BoardController::promotePawn(PromotionChoice choice)
     if (newPiece) 
     {
         m_promotionModalData->clickedTile->setPiece(newPiece);
+
+        if (m_clickedTile != nullptr && m_clickedTile->getPiece() != nullptr)
+        {
+            m_clickedTile->setPiece(nullptr);  
+        } 
+        handleTurnState();
+        handleTileState();
+
         Logger::getInstance().log(LogLevel::DEBUG, "Promoted pawn to ", choice == PromotionChoice::Queen ? "Queen" : choice == PromotionChoice::Rook ? "Rook" : choice == PromotionChoice::Bishop ? "Bishop" : "Knight");
-        return true;
+        
+        result = true;
     }
 
-    Logger::getInstance().log(LogLevel::ERROR, "Invalid promotion choice");
-    return false;
+    m_isPawnPromotionDialogActive = false;
+    m_promotionModalData = nullptr;
+    return result;
 }
 
 void BoardController::handleTurnState()

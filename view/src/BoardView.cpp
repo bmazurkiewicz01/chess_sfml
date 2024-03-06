@@ -9,7 +9,7 @@
 #include "Logger.hpp"
 #include "KingChecker.hpp"
 
-BoardView::BoardView(sf::RenderWindow& window, TextureManager textureManager) : m_window(window), m_textureManager(textureManager)
+BoardView::BoardView(sf::RenderWindow& window, TextureManager textureManager) : m_window(window), m_textureManager(textureManager), m_promotionModalView(nullptr) 
 {
     
 }
@@ -71,15 +71,16 @@ void BoardView::initializeBackRow(PieceColor color, int y)
     m_board[y][3].setPiece(std::make_shared<Queen>(queen));
 
     King king(m_textureManager.getPieceTexture(PieceType::KING, color), 4, y, color);
-    m_board[y][4].setPiece(std::make_shared<King>(king));
+    std::shared_ptr<King> kingPtr = std::make_shared<King>(king);
+    m_board[y][4].setPiece(kingPtr);
 
     if (color == PieceColor::WHITE)
     {
-        KingChecker::getInstance().setWhiteKing(std::make_shared<King>(king));
+        KingChecker::getInstance().setWhiteKing(kingPtr);
     }
     else
     {
-        KingChecker::getInstance().setBlackKing(std::make_shared<King>(king));
+        KingChecker::getInstance().setBlackKing(kingPtr);
     }
 
     Bishop bishop2(m_textureManager.getPieceTexture(PieceType::BISHOP, color), 5, y, color);
@@ -103,8 +104,20 @@ void BoardView::handleEvents()
     while (m_window.pollEvent(event))
     {
         if (event.type == sf::Event::Closed)
+        {
             m_window.close();
-        if (event.type == sf::Event::MouseButtonPressed)
+        }
+        else if (m_promotionModalView != nullptr)
+        {
+            if (event.type == sf::Event::MouseButtonPressed)
+            {
+                m_promotionModalView->handleEvent(event);
+                PromotionChoice choice = m_promotionModalView->getChoice();
+                EventManager::getInstance().publish<PromotionChoice>(EventType::ON_PAWN_PROMOTION, std::make_shared<PromotionChoice>(choice));
+                m_promotionModalView = nullptr;
+            }
+        }
+        else if (event.type == sf::Event::MouseButtonPressed)
         {
             sf::Vector2f mousePosition = m_window.mapPixelToCoords(sf::Mouse::getPosition(m_window));
             if (event.mouseButton.button == sf::Mouse::Left)
@@ -174,4 +187,14 @@ BoardType& BoardView::getBoard()
 TextureManager& BoardView::getTextureManager()
 {
     return m_textureManager;
+}
+
+void BoardView::createPromotionDialog(PieceColor playerColor, const sf::Vector2f& position)
+{
+    m_promotionModalView = std::make_unique<PromotionModalView>(m_window, m_textureManager, playerColor, position);
+}
+
+void BoardView::drawPromotionDialog()
+{
+    m_promotionModalView->draw();
 }

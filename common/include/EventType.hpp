@@ -3,7 +3,8 @@
 
 enum class EventType
 {
-    ON_TILE_PRESSED = 0
+    ON_TILE_PRESSED = 0,
+    ON_PAWN_PROMOTION = 1
 };
 
 #endif
